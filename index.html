@@ -2,7 +2,7 @@
 <html lang="fr" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Carnet de bord — Véhicules</title>
@@ -45,8 +45,8 @@
     }
   }
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  body { font-family:var(--font-sans); background:var(--color-bg); color:var(--color-text-primary); min-height:100vh; min-height:100dvh; -webkit-font-smoothing:antialiased; overscroll-behavior:none; }
-  .app { max-width:420px; margin:0 auto; padding:calc(1.25rem + env(safe-area-inset-top, 0px)) 1rem calc(3rem + env(safe-area-inset-bottom, 0px)); }
+  body { font-family:var(--font-sans); background:var(--color-bg); color:var(--color-text-primary); min-height:100vh; -webkit-font-smoothing:antialiased; overscroll-behavior:none; }
+  .app { max-width:420px; margin:0 auto; padding:1.25rem 1rem 3rem; padding:calc(1.25rem + env(safe-area-inset-top, 0px)) 1rem calc(3rem + env(safe-area-inset-bottom, 0px)); }
   input, textarea, select {
     font-family:var(--font-sans); font-size:16px; padding:0.75rem 0.85rem;
     border:1px solid var(--color-border-light); border-radius:var(--radius-md);
@@ -186,7 +186,7 @@
 
   /* Panel détail */
   .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:90; }
-  .detail-panel { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:420px; background:var(--color-bg); border-radius:20px 20px 0 0; padding:1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px)); z-index:100; box-shadow:0 -4px 24px rgba(0,0,0,0.15); }
+  .detail-panel { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:420px; background:var(--color-bg); border-radius:20px 20px 0 0; padding:1.5rem 1.25rem; padding-bottom:calc(1.5rem + env(safe-area-inset-bottom, 0px)); z-index:100; box-shadow:0 -4px 24px rgba(0,0,0,0.15); }
   .panel-handle { width:36px; height:4px; background:var(--color-bg-3); border-radius:2px; margin:0 auto 1.25rem; }
   .panel-title { font-size:15px; font-weight:600; color:var(--red-dark); margin-bottom:0.5rem; }
   .panel-meta { font-size:13px; color:var(--color-text-secondary); margin-bottom:0.75rem; }
@@ -210,7 +210,6 @@
 <mso:_ApprovalStatus msdt:dt="string">0</mso:_ApprovalStatus>
 <mso:_ApprovalAssignedTo msdt:dt="string"></mso:_ApprovalAssignedTo>
 <mso:_ApprovalRespondedBy msdt:dt="string"></mso:_ApprovalRespondedBy>
-<mso:_ApprovalSentBy msdt:dt="string"></mso:_ApprovalSentBy>
 </mso:CustomDocumentProperties>
 </xml><![endif]-->
 </head>
@@ -227,6 +226,15 @@
   </div>
 
   <div id="screenHome"></div>
+  <noscript>
+    <div style="text-align:center;padding:2rem 1rem">
+      <p style="font-size:15px;font-weight:500;margin-bottom:8px">JavaScript requis</p>
+      <p style="font-size:13px;color:#666;line-height:1.6">
+        Cette application nécessite un navigateur.<br>
+        Sur iPhone : appuyez sur <b>Partager</b> (⬆️) puis <b>Ouvrir dans Safari</b>.
+      </p>
+    </div>
+  </noscript>
   <div id="screenScan" class="hidden"></div>
   <div id="screenStart" class="hidden"></div>
   <div id="screenActive" class="hidden"></div>
@@ -263,6 +271,7 @@ const F = {
 const REASONS = [
   { id:"livraison",    label:"Livraison",    icon:"📦" },
   { id:"intervention", label:"Intervention", icon:"🔧" },
+  { id:"garage",       label:"Garage",       icon:"🏗️" },
   { id:"autre",        label:"Autre",        icon:"📋" }
 ];
 
@@ -837,7 +846,16 @@ function showDetail(tripId) {
 function closeDetail() { hide("detailOverlay"); hide("detailPanel"); }
 
 // Init
-render();
+try {
+  render();
+} catch(e) {
+  var errDiv = document.createElement('div');
+  errDiv.style.cssText = 'padding:2rem 1rem;text-align:center';
+  errDiv.innerHTML = '<p style="color:#D85A30;font-weight:500;margin-bottom:8px">Erreur au démarrage</p>' +
+    '<p style="font-size:12px;color:#888;word-break:break-all">' + e.message + '</p>';
+  document.querySelector('.app').appendChild(errDiv);
+  console.error("Init error:", e);
+}
 </script>
 </body>
 </html>
