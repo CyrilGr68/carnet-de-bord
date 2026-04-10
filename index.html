@@ -138,8 +138,8 @@
   .field-label { display:block; font-size:13px; color:var(--color-text-secondary); margin-bottom:6px; font-weight:500; }
 
   /* Raisons */
-  .reason-grid { display:flex; gap:8px; }
-  .reason-btn { flex:1; padding:0.85rem 0.5rem; border:1px solid var(--color-border-light); border-radius:var(--radius-md); background:var(--color-bg); cursor:pointer; text-align:center; transition:all 0.15s; min-height:44px; }
+  .reason-grid { display:flex; gap:8px; flex-wrap:wrap; }
+  .reason-btn { flex:1 1 auto; min-width:70px; padding:0.85rem 0.5rem; border:1px solid var(--color-border-light); border-radius:var(--radius-md); background:var(--color-bg); cursor:pointer; text-align:center; transition:all 0.15s; min-height:44px; }
   .reason-btn.active { border:2px solid var(--green); background:var(--green-bg); }
   .reason-btn .r-icon { font-size:20px; margin-bottom:4px; }
   .reason-btn .r-label { font-size:12px; font-weight:500; }
@@ -672,7 +672,7 @@ function pickReason(id) {
 function updateStartBtn() { const b=el("btnStart"); if(b) b.disabled=!(state.selectedEmployee&&state.selectedReason); }
 
 async function startTrip() {
-  if (!state.selectedEmployee||!state.selectedReason) return;
+  if (!state.vehicle || !state.selectedEmployee || !state.selectedReason) return;
   const btn=el("btnStart"); if(btn){btn.disabled=true;btn.textContent="Enregistrement...";}
   try {
     const rec = await createTrip(state.vehicle.id, state.selectedEmployee, state.selectedReason);
@@ -797,36 +797,48 @@ async function loadAndRenderHistory() {
 }
 
 function renderHistory() {
-  const search=(el("searchInput")?.value||"").toLowerCase();
-  const filtered=state.trips.filter(t=>
-    !search||t.conducteur.toLowerCase().includes(search)||t.motif.toLowerCase().includes(search)||
-    (search==="oui"&&t.anomalie)||(search==="non"&&!t.anomalie)||fmtDate(t.dateDepart).includes(search)
+  const searchEl = el("searchInput");
+  const search = (searchEl?.value || "").toLowerCase();
+  const filtered = state.trips.filter(t =>
+    !search || t.conducteur.toLowerCase().includes(search) || t.motif.toLowerCase().includes(search) ||
+    (search === "oui" && t.anomalie) || (search === "non" && !t.anomalie) || fmtDate(t.dateDepart).includes(search)
   );
-  el("screenHistory").innerHTML = `
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" value="${search}" placeholder="Conducteur, motif, date, oui/non..." oninput="renderHistory()">
-    </div>
-    <div class="history-count">${filtered.length} trajet${filtered.length>1?"s":""}</div>
-    ${filtered.length===0
-      ?`<p style="text-align:center;padding:2rem;font-size:13px;color:var(--color-text-tertiary)">Aucun résultat</p>`
-      :filtered.map(t=>{
-        const rIcon=t.anomalie?"⚠️":(REASONS.find(r=>r.id===t.motif)?.icon||"📋");
-        const rLabel=REASONS.find(r=>r.id===t.motif)?.label||t.motif;
+
+  const resultsHtml = filtered.length === 0
+    ? `<p style="text-align:center;padding:2rem;font-size:13px;color:var(--color-text-tertiary)">Aucun résultat</p>`
+    : filtered.map(t => {
+        const rIcon = t.anomalie ? "⚠️" : (REASONS.find(r => r.id === t.motif)?.icon || "📋");
+        const rLabel = REASONS.find(r => r.id === t.motif)?.label || t.motif;
         return `
           <div class="history-item" onclick="showDetail('${t.id}')">
-            <div class="history-icon" style="background:${t.anomalie?"var(--red-bg)":"var(--color-bg-2)"}">${rIcon}</div>
+            <div class="history-icon" style="background:${t.anomalie ? "var(--red-bg)" : "var(--color-bg-2)"}">${rIcon}</div>
             <div style="flex:1;min-width:0">
               <div class="history-name">${t.conducteur}</div>
-              <div class="history-meta">${rLabel}${t.anomalie?' · <span style="color:var(--red)">Anomalie</span>':""}</div>
+              <div class="history-meta">${rLabel}${t.anomalie ? ' · <span style="color:var(--red)">Anomalie</span>' : ""}</div>
             </div>
             <div class="history-right">
               <div class="history-date">${fmtDate(t.dateDepart)}</div>
-              <div class="history-time">${fmtTime(t.dateDepart)}${t.dateRetour?" · "+fmtDuration(t.dateDepart,t.dateRetour):""}</div>
+              <div class="history-time">${fmtTime(t.dateDepart)}${t.dateRetour ? " · " + fmtDuration(t.dateDepart, t.dateRetour) : ""}</div>
             </div>
           </div>`;
-      }).join("")}
-  `;
+      }).join("");
+
+  // Si le champ de recherche existe déjà, ne mettre à jour que les résultats
+  const resultsEl = el("historyResults");
+  if (resultsEl && searchEl) {
+    resultsEl.innerHTML = `<div class="history-count">${filtered.length} trajet${filtered.length > 1 ? "s" : ""}</div>` + resultsHtml;
+  } else {
+    el("screenHistory").innerHTML = `
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" value="${search}" placeholder="Conducteur, motif, date, oui/non..." oninput="renderHistory()">
+      </div>
+      <div id="historyResults">
+        <div class="history-count">${filtered.length} trajet${filtered.length > 1 ? "s" : ""}</div>
+        ${resultsHtml}
+      </div>
+    `;
+  }
 }
 
 function showDetail(tripId) {
