@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Carnet de bord — Véhicules</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-sans: 'DM Sans', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: #5a5a5a;
+    --color-text-tertiary: #8a8a8a;
+    --color-bg: #ffffff;
+    --color-bg-2: #f5f5f5;
+    --color-bg-3: #e0e0e0;
+    --color-border: #d0d0d0;
+    --color-border-light: #e5e5e5;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --green: #1D9E75;
+    --green-bg: #E1F5EE;
+    --green-dark: #085041;
+    --red: #D85A30;
+    --red-bg: #FAECE7;
+    --red-dark: #712B13;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-text-primary: #e8e8e8;
+      --color-text-secondary: #a0a0a0;
+      --color-text-tertiary: #606060;
+      --color-bg: #1a1a1a;
+      --color-bg-2: #252525;
+      --color-bg-3: #333;
+      --color-border: #444;
+      --color-border-light: #2e2e2e;
+      --green-bg: #0d2e24;
+      --green-dark: #8ee4c0;
+      --red-bg: #2e1a14;
+      --red-dark: #f0a080;
+    }
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { font-family:var(--font-sans); background:var(--color-bg); color:var(--color-text-primary); min-height:100vh; -webkit-font-smoothing:antialiased; overscroll-behavior:none; }
+  .app { max-width:420px; margin:0 auto; padding:1.25rem 1rem 3rem; padding:calc(1.25rem + env(safe-area-inset-top, 0px)) 1rem calc(3rem + env(safe-area-inset-bottom, 0px)); }
+  input, textarea, select {
+    font-family:var(--font-sans); font-size:16px; padding:0.75rem 0.85rem;
+    border:1px solid var(--color-border-light); border-radius:var(--radius-md);
+    background:var(--color-bg); color:var(--color-text-primary);
+    outline:none; transition:border-color 0.15s; width:100%;
+    -webkit-appearance:none; appearance:none;
+  }
+  input:focus, textarea:focus, select:focus { border-color:var(--green); }
+  button {
+    font-family:var(--font-sans); font-size:14px;
+    border:1px solid var(--color-border-light); border-radius:var(--radius-md);
+    background:var(--color-bg); color:var(--color-text-primary);
+    cursor:pointer; transition:all 0.15s ease; min-height:44px;
+  }
+  button:hover, button:active { background:var(--color-bg-2); }
+
+  /* Header */
+  .header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; padding-bottom:0.85rem; border-bottom:1px solid var(--color-border-light); }
+  .header-title { font-size:17px; font-weight:600; letter-spacing:-0.3px; }
+  .header-sub { font-size:12px; color:var(--color-text-tertiary); margin-top:2px; }
+
+  /* Page de garde */
+  .welcome-screen { text-align:center; padding:2rem 0; }
+  .welcome-logo { font-size:52px; margin-bottom:1rem; }
+  .welcome-title { font-size:22px; font-weight:600; margin-bottom:6px; letter-spacing:-0.5px; }
+  .welcome-sub { font-size:14px; color:var(--color-text-secondary); margin-bottom:2.5rem; line-height:1.6; }
+  .welcome-btn {
+    display:block; width:100%; padding:1.1rem 1rem;
+    border-radius:var(--radius-lg); font-size:15px; font-weight:500;
+    margin-bottom:12px; cursor:pointer; transition:all 0.2s; text-align:left;
+    display:flex; align-items:center; gap:14px;
+  }
+  .welcome-btn-primary { background:var(--green); color:#fff; border:none; }
+  .welcome-btn-primary:hover { opacity:0.9; background:var(--green); }
+  .welcome-btn-secondary { background:var(--color-bg-2); color:var(--color-text-primary); border:1px solid var(--color-border-light); }
+  .welcome-btn-secondary:hover { background:var(--color-bg-3); }
+  .btn-icon-circle { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .btn-icon-circle-green { background:rgba(255,255,255,0.2); }
+  .btn-icon-circle-gray { background:var(--color-bg-3); }
+  .btn-text { flex:1; }
+  .btn-label { display:block; font-size:15px; font-weight:500; }
+  .btn-sub { display:block; font-size:12px; opacity:0.7; margin-top:2px; }
+
+  /* Trajet en cours sur accueil */
+  .home-active-banner {
+    background:var(--green-bg); border:1.5px solid var(--green);
+    border-radius:var(--radius-lg); padding:1rem 1.1rem;
+    margin-bottom:1.25rem; cursor:pointer; transition:all 0.15s;
+    display:flex; align-items:center; gap:12px;
+  }
+  .home-active-banner:active { opacity:0.85; }
+  .home-active-dot { width:10px; height:10px; border-radius:50%; background:var(--green); flex-shrink:0; animation:pulse 1.5s ease infinite; }
+  .home-active-info { flex:1; min-width:0; }
+  .home-active-title { font-size:14px; font-weight:600; color:var(--green-dark); margin-bottom:2px; }
+  .home-active-meta { font-size:12px; color:var(--green-dark); opacity:0.8; }
+  .home-active-arrow { font-size:20px; color:var(--green); flex-shrink:0; }
+  .home-active-loading { text-align:center; padding:0.75rem; font-size:13px; color:var(--color-text-tertiary); }
+
+  /* Véhicules */
+  .vehicle-list { display:flex; flex-direction:column; gap:10px; }
+  .vehicle-card {
+    background:var(--color-bg); border:1px solid var(--color-border-light);
+    border-radius:var(--radius-lg); padding:0.9rem 1rem;
+    cursor:pointer; transition:all 0.15s;
+    display:flex; align-items:center; gap:14px;
+  }
+  .vehicle-card:hover, .vehicle-card:active { border-color:var(--green); background:var(--green-bg); }
+  .vehicle-card-disabled { opacity:0.5; cursor:not-allowed !important; pointer-events:none; }
+  .vehicle-card-disabled:hover { border-color:var(--color-border-light); background:var(--color-bg); }
+  .vehicle-busy { font-size:11px; color:var(--red); font-weight:500; margin-top:2px; }
+  .vehicle-thumb {
+    width:52px; height:52px; border-radius:10px;
+    background:var(--color-bg-2); display:flex; align-items:center;
+    justify-content:center; font-size:24px; flex-shrink:0; overflow:hidden;
+  }
+  .vehicle-thumb img { width:100%; height:100%; object-fit:cover; }
+  .vehicle-info { flex:1; min-width:0; }
+  .vehicle-name { font-size:15px; font-weight:500; margin-bottom:3px; }
+  .vehicle-plate { font-size:12px; color:var(--color-text-tertiary); font-family:var(--font-mono); letter-spacing:0.5px; }
+
+  /* Info bar */
+  .info-bar { background:var(--color-bg-2); border-radius:var(--radius-md); padding:0.75rem 1rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:10px; }
+  .info-bar .v-name { font-size:14px; font-weight:500; }
+  .info-bar .v-plate { font-size:12px; color:var(--color-text-secondary); font-family:var(--font-mono); }
+  .info-bar .v-right { margin-left:auto; text-align:right; }
+  .info-bar .v-date { font-size:13px; font-weight:500; }
+  .info-bar .v-time { font-size:12px; color:var(--color-text-secondary); }
+
+  .field-label { display:block; font-size:13px; color:var(--color-text-secondary); margin-bottom:6px; font-weight:500; }
+
+  /* Raisons */
+  .reason-grid { display:flex; gap:8px; flex-wrap:wrap; }
+  .reason-btn { flex:1 1 auto; min-width:70px; padding:0.85rem 0.5rem; border:1px solid var(--color-border-light); border-radius:var(--radius-md); background:var(--color-bg); cursor:pointer; text-align:center; transition:all 0.15s; min-height:44px; }
+  .reason-btn.active { border:2px solid var(--green); background:var(--green-bg); }
+  .reason-btn .r-icon { font-size:20px; margin-bottom:4px; }
+  .reason-btn .r-label { font-size:12px; font-weight:500; }
+  .reason-btn.active .r-label { color:var(--green-dark); }
+
+  /* Boutons */
+  .btn-row { display:flex; gap:8px; }
+  .btn-cancel { flex:1; padding:0.85rem; font-size:14px; }
+  .btn-primary { flex:2; padding:0.85rem; background:var(--green); color:#fff; border:none; border-radius:var(--radius-md); font-weight:500; font-size:15px; }
+  .btn-primary:hover { opacity:0.9; background:var(--green); }
+  .btn-primary:disabled { background:var(--color-bg-3); color:var(--color-text-tertiary); cursor:default; opacity:1; }
+
+  /* Actif */
+  .active-banner { background:var(--green-bg); border-radius:var(--radius-lg); padding:1.5rem; margin-bottom:1.25rem; text-align:center; }
+  .pulse-dot { display:inline-block; width:9px; height:9px; border-radius:50%; background:var(--green); margin-right:8px; animation:pulse 1.5s ease infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .active-label { font-size:14px; font-weight:500; color:var(--green-dark); }
+  .active-elapsed { font-size:40px; font-weight:600; color:var(--green-dark); margin-top:0.75rem; font-family:var(--font-mono); letter-spacing:2px; }
+  .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1.25rem; }
+  .detail-card { background:var(--color-bg-2); border-radius:var(--radius-md); padding:0.75rem; }
+  .detail-label { font-size:11px; color:var(--color-text-tertiary); margin-bottom:3px; text-transform:uppercase; letter-spacing:0.5px; }
+  .detail-value { font-size:14px; font-weight:500; }
+  .btn-end { width:100%; padding:1rem; background:var(--red); color:#fff; border:none; border-radius:var(--radius-md); font-weight:500; font-size:15px; cursor:pointer; }
+  .btn-end:hover { opacity:0.9; background:var(--red); }
+
+  /* Anomalie */
+  .anomaly-btn { flex:1; padding:0.85rem; border:1px solid var(--color-border-light); border-radius:var(--radius-md); background:var(--color-bg); cursor:pointer; font-size:14px; font-weight:500; transition:all 0.15s; min-height:44px; }
+  .anomaly-btn.no-active { border:2px solid var(--green); background:var(--green-bg); color:var(--green-dark); }
+  .anomaly-btn.yes-active { border:2px solid var(--red); background:var(--red-bg); color:var(--red-dark); }
+
+  /* Historique */
+  .search-box { position:relative; margin-bottom:1rem; }
+  .search-icon { position:absolute; left:0.7rem; top:50%; transform:translateY(-50%); font-size:14px; color:var(--color-text-tertiary); pointer-events:none; }
+  .search-box input { padding-left:2.1rem; }
+  .history-count { font-size:13px; color:var(--color-text-tertiary); margin-bottom:10px; }
+  .history-item { background:var(--color-bg); border:1px solid var(--color-border-light); border-radius:var(--radius-md); padding:0.7rem 0.85rem; display:flex; align-items:center; gap:10px; margin-bottom:6px; cursor:pointer; transition:background 0.1s; }
+  .history-item:hover, .history-item:active { background:var(--color-bg-2); }
+  .history-icon { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+  .history-name { font-size:13px; font-weight:500; }
+  .history-meta { font-size:11px; color:var(--color-text-tertiary); margin-top:1px; }
+  .history-right { flex-shrink:0; text-align:right; }
+  .history-date { font-size:12px; font-weight:500; }
+  .history-time { font-size:11px; color:var(--color-text-tertiary); }
+
+  /* Panel détail */
+  .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:90; }
+  .detail-panel { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:420px; background:var(--color-bg); border-radius:20px 20px 0 0; padding:1.5rem 1.25rem; padding-bottom:calc(1.5rem + env(safe-area-inset-bottom, 0px)); z-index:100; box-shadow:0 -4px 24px rgba(0,0,0,0.15); }
+  .panel-handle { width:36px; height:4px; background:var(--color-bg-3); border-radius:2px; margin:0 auto 1.25rem; }
+  .panel-title { font-size:15px; font-weight:600; color:var(--red-dark); margin-bottom:0.5rem; }
+  .panel-meta { font-size:13px; color:var(--color-text-secondary); margin-bottom:0.75rem; }
+  .panel-desc { font-size:14px; line-height:1.6; padding:0.75rem; background:var(--red-bg); border-radius:var(--radius-md); margin-bottom:1rem; }
+  .btn-close-panel { width:100%; padding:0.85rem; background:var(--color-bg-2); border-radius:var(--radius-md); font-size:14px; font-weight:500; min-height:44px; }
+
+  /* Confirmé */
+  .confirm-screen { text-align:center; padding:3rem 1rem; }
+  .confirm-icon { width:60px; height:60px; border-radius:50%; background:var(--green-bg); display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-size:26px; color:var(--green); font-weight:700; }
+  .confirm-title { font-size:17px; font-weight:600; margin-bottom:6px; }
+  .confirm-sub { font-size:13px; color:var(--color-text-secondary); }
+
+  .spinner { width:36px; height:36px; border:3px solid var(--color-border-light); border-top-color:var(--green); border-radius:50%; margin:2rem auto; animation:spin 0.7s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .mb-4 { margin-bottom:1rem; }
+  .hidden { display:none !important; }
+</style>
+
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:_ApprovalStatus msdt:dt="string">0</mso:_ApprovalStatus>
+<mso:_ApprovalAssignedTo msdt:dt="string"></mso:_ApprovalAssignedTo>
+<mso:_ApprovalRespondedBy msdt:dt="string"></mso:_ApprovalRespondedBy>
+<mso:_ApprovalSentBy msdt:dt="string"></mso:_ApprovalSentBy>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <div class="header-title">🚐 Carnet de bord</div>
+      <div class="header-sub" id="headerSub">Gestion des véhicules</div>
+    </div>
+    <div id="headerBack" class="hidden">
+      <button onclick="goBack()" style="padding:10px 18px;font-size:14px">← Retour</button>
+    </div>
+  </div>
+
+  <div id="screenHome"></div>
+  <noscript>
+    <div style="text-align:center;padding:2rem 1rem">
+      <p style="font-size:15px;font-weight:500;margin-bottom:8px">JavaScript requis</p>
+      <p style="font-size:13px;color:#666;line-height:1.6">
+        Cette application nécessite un navigateur.<br>
+        Sur iPhone : appuyez sur <b>Partager</b> (⬆️) puis <b>Ouvrir dans Safari</b>.
+      </p>
+    </div>
+  </noscript>
+  <div id="screenScan" class="hidden"></div>
+  <div id="screenStart" class="hidden"></div>
+  <div id="screenActive" class="hidden"></div>
+  <div id="screenEnd" class="hidden"></div>
+  <div id="screenConfirmed" class="hidden"></div>
+  <div id="screenHistory" class="hidden"></div>
+  <div id="detailOverlay" class="hidden"></div>
+  <div id="detailPanel" class="hidden"></div>
+</div>
+
+<script>
+// ============================================================
+// CONFIG — remplace TON_TOKEN_ICI par ton Personal Access Token
+// ============================================================
+const AIRTABLE_TOKEN = "patfxRbzwpYU6ovpN.b3a0edd9d1e8417fddf7f3734bb67569375a0861e9dfec3c766415362cc29862";
+const BASE_ID       = "app2Zz2G7FGpd8ws2";
+const TBL_VEHICULES  = "tblcjkGFzkuEjBUto";
+const TBL_TRAJETS    = "tblTO6Ht4G9KBgJ1S";
+const TBL_CONDUCTEURS = "tblcgQovDKM3b2YIQ";
+const F_C_NOM = "fldR7sgc8GKgYC3qJ";
+const F = {
+  V_NOM:          "fldedsm7pYfFfaXV1",
+  V_IMMAT:        "fld98AkS9tVUYHR8y",
+  V_PHOTO:        "fldm40w3wOM96DSrS",
+  T_CONDUCTEUR:   "fldVIenVUkULxPMtv",
+  T_MOTIF:        "fldf2sVxXN6bJQLIQ",
+  T_DATE_DEPART:  "fldlPbYt4j2TVWlbx",
+  T_DATE_RETOUR:  "fldHHhmH5n2r5QGRe",
+  T_ANOMALIE:     "fldnTbLr9q8TDFkXh",
+  T_DESC_ANOMALIE:"fldQDmlGEPA0gmGG2",
+  T_VEHICULE:     "fldsrqlgNVwMwQ2tf",
+};
+
+const REASONS = [
+  { id:"livraison",    label:"Livraison",    icon:"📦" },
+  { id:"intervention", label:"Intervention", icon:"🔧" },
+  { id:"garage",       label:"Garage",       icon:"🏗️" },
+  { id:"autre",        label:"Autre",        icon:"📋" }
+];
+
+let CONDUCTEURS = [];
+
+let state = {
+  screen:"home", mode:null, vehicle:null, activeTrip:null,
+  vehicles:[], trips:[], activeVehicleIds:new Set(), activeConducteurs:new Set(),
+  homeActiveTrips:null, homeLoading:false,
+  selectedEmployee:"", selectedReason:"",
+  hasAnomaly:null, anomalyText:"",
+  elapsedInterval:null,
+};
+
+// ============================================================
+// API
+// ============================================================
+async function api(path, options={}) {
+  const url = `https://api.airtable.com/v0/${BASE_ID}/${path}`;
+  const res = await fetch(url, {
+    ...options,
+    mode: "cors",
+    headers:{
+      "Authorization":`Bearer ${AIRTABLE_TOKEN}`,
+      "Content-Type":"application/json",
+      ...(options.headers||{})
+    }
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    console.error("Airtable error:", res.status, err);
+    throw new Error(`Airtable ${res.status}: ${err}`);
+  }
+  return res.json();
+}
+
+async function getConducteurs() {
+  const d = await api(`${TBL_CONDUCTEURS}?fields[]=Nom&sort[0][field]=Nom&sort[0][direction]=asc`);
+  return d.records.map(r => r.fields["Nom"] || "").filter(Boolean);
+}
+
+async function getVehicles() {
+  const d = await api(`${TBL_VEHICULES}?fields[]=Nom&fields[]=Immatriculation&fields[]=Photo`);
+  return d.records.map(r=>({ id:r.id, name:r.fields["Nom"]||"", plate:r.fields["Immatriculation"]||"", photo:r.fields["Photo"]?.[0]?.url||null }));
+}
+
+async function getActiveTrip(vehicleId) {
+  const formula = encodeURIComponent(`AND(FIND("${vehicleId}",ARRAYJOIN({Véhicule},",")),{DateRetour}="")`);
+  const d = await api(`${TBL_TRAJETS}?filterByFormula=${formula}&maxRecords=1`);
+  if (!d.records.length) return null;
+  const r = d.records[0];
+  return { id:r.id, conducteur:r.fields["Conducteur"]||"", motif:r.fields["MotifTrajet"]||"", dateDepart:r.fields["DateDepart"]||null };
+}
+
+async function createTrip(vehicleId, conducteur, motif) {
+  return api(TBL_TRAJETS, { method:"POST", body:JSON.stringify({
+    fields:{
+      "Conducteur": conducteur,
+      "MotifTrajet": motif,
+      "DateDepart": new Date().toISOString(),
+      "Véhicule": [vehicleId],
+      "Anomalie": false
+    },
+    typecast: true
+  })});
+}
+
+async function closeTrip(recordId, hasAnomaly, anomalyText) {
+  const fields = { "DateRetour": new Date().toISOString(), "Anomalie": hasAnomaly };
+  if (hasAnomaly && anomalyText) fields["DescriptionAnomalie"] = anomalyText;
+  return api(`${TBL_TRAJETS}/${recordId}`, { method:"PATCH", body:JSON.stringify({ fields }) });
+}
+
+async function getActiveResources() {
+  const formula = encodeURIComponent(`{DateRetour}=""`);
+  const d = await api(`${TBL_TRAJETS}?filterByFormula=${formula}&fields[]=Véhicule&fields[]=Conducteur`);
+  const vehicleIds = new Set();
+  const conducteurs = new Set();
+  d.records.forEach(r => {
+    const vIds = r.fields["Véhicule"];
+    if (Array.isArray(vIds)) vIds.forEach(id => vehicleIds.add(id));
+    if (r.fields["Conducteur"]) conducteurs.add(r.fields["Conducteur"]);
+  });
+  return { vehicleIds, conducteurs };
+}
+
+async function getAllActiveTrips() {
+  const formula = encodeURIComponent(`{DateRetour}=""`);
+  const d = await api(`${TBL_TRAJETS}?filterByFormula=${formula}&fields[]=Conducteur&fields[]=MotifTrajet&fields[]=DateDepart&fields[]=Véhicule`);
+  return d.records.map(r => ({
+    id: r.id,
+    conducteur: r.fields["Conducteur"] || "",
+    motif: r.fields["MotifTrajet"] || "",
+    dateDepart: r.fields["DateDepart"] || null,
+    vehicleId: r.fields["Véhicule"]?.[0] || null
+  }));
+}
+
+async function getAllTrips() {
+  const d = await api(`${TBL_TRAJETS}?sort[0][field]=DateDepart&sort[0][direction]=desc&maxRecords=200`);
+  return d.records.map(r=>({
+    id:r.id,
+    conducteur:r.fields["Conducteur"]||"",
+    motif:r.fields["MotifTrajet"]||"",
+    dateDepart:r.fields["DateDepart"]||null,
+    dateRetour:r.fields["DateRetour"]||null,
+    anomalie:r.fields["Anomalie"]||false,
+    descAnomalie:r.fields["DescriptionAnomalie"]||""
+  }));
+}
+
+// ============================================================
+// FORMAT
+// ============================================================
+const fmtDate = d => d ? new Date(d).toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"}) : "—";
+const fmtTime = d => d ? new Date(d).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}) : "—";
+function fmtDuration(s,e) {
+  if (!s||!e) return "—";
+  const mins=Math.round((new Date(e)-new Date(s))/60000);
+  const h=Math.floor(mins/60),m=mins%60;
+  return h===0?`${m} min`:`${h}h${String(m).padStart(2,"0")}`;
+}
+function elapsed(t) {
+  const s=Math.floor((Date.now()-new Date(t))/1000);
+  return `${String(Math.floor(s/3600)).padStart(2,"0")}:${String(Math.floor((s%3600)/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+const show = id => document.getElementById(id).classList.remove("hidden");
+const hide = id => document.getElementById(id).classList.add("hidden");
+const el   = id => document.getElementById(id);
+function hideAll() { ["screenHome","screenScan","screenStart","screenActive","screenEnd","screenConfirmed","screenHistory"].forEach(hide); }
+
+function setHeader(sub, showBack) {
+  el("headerSub").textContent = sub;
+  el("headerBack").classList.toggle("hidden", !showBack);
+}
+
+function goBack() {
+  if (state.elapsedInterval) clearInterval(state.elapsedInterval);
+  const prev = { scan:"home", start:"scan", end:"active", history:"home" };
+  state.screen = prev[state.screen] || "home";
+  if (state.screen === "home") { state.vehicle=null; state.mode=null; state.homeActiveTrips=null; }
+  render();
+}
+
+function render() {
+  hideAll();
+  const screens = {
+    home:      ["Gestion des véhicules",    false, renderHome,      "screenHome"],
+    scan:      [state.mode==="trip"?"Choisir un véhicule":"Choisir un véhicule", true, renderScan, "screenScan"],
+    start:     [state.vehicle?.name||"",   true,  renderStart,     "screenStart"],
+    active:    ["Trajet en cours",          false, renderActive,    "screenActive"],
+    end:       ["Fin de trajet",            false, renderEnd,       "screenEnd"],
+    confirmed: ["Confirmé",                 false, renderConfirmed, "screenConfirmed"],
+    history:   ["Historique des trajets",   true,  renderHistory,   "screenHistory"],
+  };
+  const [sub, back, fn, screenId] = screens[state.screen] || screens.home;
+  setHeader(sub, back);
+  fn();
+  show(screenId);
+}
+
+// ============================================================
+// PAGE DE GARDE
+// ============================================================
+function renderHome() {
+  const activeHtml = buildActiveTripsHtml();
+  el("screenHome").innerHTML = `
+    <div class="welcome-screen">
+      <div class="welcome-logo">🚐</div>
+      <div class="welcome-title">Carnet de bord</div>
+      <div class="welcome-sub">Que souhaitez-vous faire ?</div>
+      <div id="homeActiveZone">${activeHtml}</div>
+      <button class="welcome-btn welcome-btn-primary" onclick="startMode('trip')">
+        <div class="btn-icon-circle btn-icon-circle-green">🚀</div>
+        <div class="btn-text">
+          <span class="btn-label">Démarrer un trajet</span>
+          <span class="btn-sub">Enregistrer une nouvelle sortie</span>
+        </div>
+      </button>
+      <button class="welcome-btn welcome-btn-secondary" onclick="startMode('history')">
+        <div class="btn-icon-circle btn-icon-circle-gray">📋</div>
+        <div class="btn-text">
+          <span class="btn-label">Consulter l'historique</span>
+          <span class="btn-sub">Voir tous les trajets passés</span>
+        </div>
+      </button>
+    </div>
+  `;
+  // Charge les trajets actifs en arrière-plan si pas encore chargés
+  if (state.homeActiveTrips === null && !state.homeLoading) {
+    loadHomeActiveTrips();
+  }
+}
+
+function buildActiveTripsHtml() {
+  if (state.homeLoading) {
+    return `<div class="home-active-loading">Vérification des trajets en cours...</div>`;
+  }
+  if (!state.homeActiveTrips || state.homeActiveTrips.length === 0) return "";
+  return state.homeActiveTrips.map(t => {
+    const rLabel = REASONS.find(r=>r.id===t.motif)?.label || t.motif;
+    const vName = t.vehicleName || "Véhicule";
+    const dur = t.dateDepart ? elapsed(t.dateDepart) : "";
+    return `
+      <div class="home-active-banner" onclick="resumeTrip('${t.id}')">
+        <div class="home-active-dot"></div>
+        <div class="home-active-info">
+          <div class="home-active-title">Trajet en cours — ${vName}</div>
+          <div class="home-active-meta">${t.conducteur} · ${rLabel} · ${dur}</div>
+        </div>
+        <div class="home-active-arrow">›</div>
+      </div>`;
+  }).join("");
+}
+
+async function loadHomeActiveTrips() {
+  state.homeLoading = true;
+  const zone = el("homeActiveZone");
+  if (zone) zone.innerHTML = buildActiveTripsHtml();
+  try {
+    const trips = await getAllActiveTrips();
+    // Charger les véhicules si pas encore fait pour avoir les noms
+    if (trips.length > 0 && !state.vehicles.length) {
+      const vehicles = await getVehicles();
+      state.vehicles = vehicles;
+    }
+    // Enrichir chaque trajet avec le nom du véhicule
+    state.homeActiveTrips = trips.map(t => ({
+      ...t,
+      vehicleName: state.vehicles.find(v=>v.id===t.vehicleId)?.name || "Véhicule inconnu",
+      vehiclePlate: state.vehicles.find(v=>v.id===t.vehicleId)?.plate || ""
+    }));
+  } catch(e) {
+    console.error("Erreur chargement trajets actifs:", e);
+    state.homeActiveTrips = [];
+  }
+  state.homeLoading = false;
+  const zone2 = el("homeActiveZone");
+  if (zone2) zone2.innerHTML = buildActiveTripsHtml();
+}
+
+async function resumeTrip(tripId) {
+  const t = state.homeActiveTrips?.find(x=>x.id===tripId);
+  if (!t) return;
+  // Trouver le véhicule
+  const v = state.vehicles.find(x=>x.id===t.vehicleId);
+  if (!v) { alert("Véhicule introuvable."); return; }
+  state.vehicle = v;
+  state.activeTrip = { id:t.id, conducteur:t.conducteur, motif:t.motif, dateDepart:t.dateDepart };
+  state.mode = "trip";
+  state.screen = "active";
+  render();
+}
+
+async function startMode(mode) {
+  state.mode = mode;
+  if (mode === "history") {
+    state.screen = "history";
+    render();
+    loadAndRenderHistory();
+  } else {
+    state.screen = "scan";
+    render();
+    // Toujours charger conducteurs + activeVehicleIds (même si véhicules déjà en cache)
+    if (!state.vehicles.length || !CONDUCTEURS.length) {
+      await loadVehicles();
+    } else {
+      // Véhicules et conducteurs déjà chargés, mais rafraîchir les trajets actifs
+      try {
+        const activeRes = await getActiveResources();
+        state.activeVehicleIds = activeRes.vehicleIds;
+        state.activeConducteurs = activeRes.conducteurs;
+      } catch(e) { console.error("Erreur refresh actifs:", e); }
+      renderScan();
+    }
+  }
+}
+
+// ============================================================
+// SELECTION VEHICULE
+// ============================================================
+function renderScan() {
+  if (!state.vehicles.length) {
+    el("screenScan").innerHTML = `<div class="spinner"></div><p style="text-align:center;font-size:14px;color:var(--color-text-secondary)">Chargement...</p>`;
+    return;
+  }
+  el("screenScan").innerHTML = `
+    <p style="font-size:14px;color:var(--color-text-secondary);margin-bottom:1.25rem">
+      Sélectionnez le véhicule :
+    </p>
+    <div class="vehicle-list">
+      ${state.vehicles.map(v=>{
+        const isActive = state.activeVehicleIds && state.activeVehicleIds.has(v.id);
+        return `
+        <div class="vehicle-card ${isActive?'vehicle-card-disabled':''}" ${isActive?'':`onclick="selectVehicle('${v.id}')"`}>
+          <div class="vehicle-thumb">${v.photo?`<img src="${v.photo}" alt="${v.name}">`:`🚐`}</div>
+          <div class="vehicle-info">
+            <div class="vehicle-name">${v.name}</div>
+            <div class="vehicle-plate">${v.plate}</div>
+            ${isActive?`<div class="vehicle-busy">En trajet</div>`:''}
+          </div>
+          <span style="font-size:18px;color:var(--color-text-tertiary)">${isActive?'🔒':'›'}</span>
+        </div>`;
+      }).join("")}
+    </div>
+  `;
+}
+
+async function loadVehicles() {
+  el("screenScan").innerHTML = `<div class="spinner"></div><p style="text-align:center;font-size:14px;color:var(--color-text-secondary)">Chargement...</p>`;
+  try {
+    const [vehicles, conducteurs, activeRes] = await Promise.all([getVehicles(), getConducteurs(), getActiveResources()]);
+    state.vehicles = vehicles;
+    state.activeVehicleIds = activeRes.vehicleIds;
+    state.activeConducteurs = activeRes.conducteurs;
+    CONDUCTEURS = conducteurs;
+    console.log("Véhicules chargés:", vehicles.length, "Conducteurs:", conducteurs.length, "Véhicules actifs:", activeRes.vehicleIds.size, "Conducteurs actifs:", activeRes.conducteurs.size);
+    renderScan();
+  } catch(e) {
+    console.error("Erreur loadVehicles:", e);
+    el("screenScan").innerHTML = `
+      <p style="text-align:center;padding:2rem;font-size:14px;color:var(--color-text-secondary)">
+        Erreur de connexion Airtable.<br>
+        <small style="font-size:12px;color:#999">${e.message}</small><br><br>
+        <button onclick="loadVehicles()" style="padding:8px 20px">Réessayer</button>
+      </p>`;
+  }
+}
+
+async function selectVehicle(vid) {
+  state.vehicle = state.vehicles.find(x=>x.id===vid);
+  if (state.mode === "trip") {
+    el("screenScan").innerHTML = `<div class="spinner"></div><p style="text-align:center;font-size:14px;color:var(--color-text-secondary)">Vérification en cours...</p>`;
+    try {
+      const active = await getActiveTrip(vid);
+      if (active) { state.activeTrip = active; state.screen = "active"; }
+      else { state.screen = "start"; state.selectedEmployee=""; state.selectedReason=""; }
+    } catch(e) { state.screen = "start"; }
+  } else {
+    state.screen = "history";
+    state.trips = [];
+  }
+  render();
+  if (state.screen === "history") loadAndRenderHistory();
+}
+
+// ============================================================
+// ECRAN DEMARRAGE
+// ============================================================
+function renderStart() {
+  const v = state.vehicle, now = new Date();
+  el("screenStart").innerHTML = `
+    <div class="info-bar">
+      <div class="vehicle-thumb" style="width:42px;height:42px;font-size:18px;border-radius:8px">
+        ${v.photo?`<img src="${v.photo}" alt="${v.name}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`:`🚐`}
+      </div>
+      <div><div class="v-name">${v.name}</div><div class="v-plate">${v.plate}</div></div>
+      <div class="v-right"><div class="v-date">${fmtDate(now)}</div><div class="v-time">${fmtTime(now)}</div></div>
+    </div>
+    <div class="mb-4">
+      <label class="field-label">Conducteur</label>
+      <select id="selConducteur" onchange="state.selectedEmployee=this.value;updateStartBtn()">
+        <option value="">-- Sélectionner --</option>
+        ${CONDUCTEURS.map(c=>{
+          const busy = state.activeConducteurs && state.activeConducteurs.has(c);
+          return `<option value="${c}" ${busy?"disabled":""} ${state.selectedEmployee===c?"selected":""}>${c}${busy?" (en trajet)":""}</option>`;
+        }).join("")}
+      </select>
+    </div>
+    <div class="mb-4">
+      <label class="field-label" style="margin-bottom:8px">Motif du trajet</label>
+      <div class="reason-grid">
+        ${REASONS.map(r=>`
+          <div class="reason-btn ${state.selectedReason===r.id?"active":""}" onclick="pickReason('${r.id}')">
+            <div class="r-icon">${r.icon}</div>
+            <div class="r-label">${r.label}</div>
+          </div>`).join("")}
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="goBack()">Annuler</button>
+      <button class="btn-primary" id="btnStart" onclick="startTrip()" ${!(state.selectedEmployee&&state.selectedReason)?"disabled":""}>
+        Démarrer le trajet
+      </button>
+    </div>
+  `;
+}
+
+function pickReason(id) {
+  state.selectedReason = id;
+  document.querySelectorAll(".reason-btn").forEach(b=>b.classList.toggle("active",b.getAttribute("onclick").includes(`'${id}'`)));
+  updateStartBtn();
+}
+function updateStartBtn() { const b=el("btnStart"); if(b) b.disabled=!(state.selectedEmployee&&state.selectedReason); }
+
+async function startTrip() {
+  if (!state.vehicle || !state.selectedEmployee || !state.selectedReason) return;
+  const btn=el("btnStart"); if(btn){btn.disabled=true;btn.textContent="Enregistrement...";}
+  try {
+    const rec = await createTrip(state.vehicle.id, state.selectedEmployee, state.selectedReason);
+    state.activeTrip = { id:rec.id, conducteur:state.selectedEmployee, motif:state.selectedReason, dateDepart:rec.fields[F.T_DATE_DEPART]||new Date().toISOString() };
+    state.activeVehicleIds.add(state.vehicle.id);
+    state.activeConducteurs.add(state.selectedEmployee);
+    state.screen = "active"; render();
+  } catch(e) {
+    alert("Erreur lors de la création du trajet.");
+    if(btn){btn.disabled=false;btn.textContent="Démarrer le trajet";}
+  }
+}
+
+// ============================================================
+// ECRAN ACTIF
+// ============================================================
+function renderActive() {
+  const v=state.vehicle, t=state.activeTrip;
+  const rLabel = REASONS.find(r=>r.id===t.motif)?.label||t.motif;
+  el("screenActive").innerHTML = `
+    <div class="active-banner">
+      <div><span class="pulse-dot"></span><span class="active-label">Trajet en cours</span></div>
+      <div class="active-elapsed" id="elapsedDisplay">${elapsed(t.dateDepart)}</div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-card"><div class="detail-label">Conducteur</div><div class="detail-value">${t.conducteur}</div></div>
+      <div class="detail-card"><div class="detail-label">Motif</div><div class="detail-value">${rLabel}</div></div>
+      <div class="detail-card"><div class="detail-label">Départ</div><div class="detail-value">${fmtTime(t.dateDepart)}</div></div>
+      <div class="detail-card"><div class="detail-label">Véhicule</div><div class="detail-value">${v.name}</div></div>
+    </div>
+    <button class="btn-end" onclick="requestEnd()">Terminer le trajet</button>
+  `;
+  if (state.elapsedInterval) clearInterval(state.elapsedInterval);
+  state.elapsedInterval = setInterval(()=>{ const d=el("elapsedDisplay"); if(d) d.textContent=elapsed(t.dateDepart); }, 1000);
+}
+
+function requestEnd() {
+  if (state.elapsedInterval) clearInterval(state.elapsedInterval);
+  state.screen="end"; state.hasAnomaly=null; state.anomalyText=""; render();
+}
+
+// ============================================================
+// ECRAN FIN
+// ============================================================
+function renderEnd() {
+  const t=state.activeTrip, now=new Date().toISOString();
+  state._endTime=now;
+  const rLabel=REASONS.find(r=>r.id===t.motif)?.label||t.motif;
+  el("screenEnd").innerHTML = `
+    <div style="background:var(--color-bg-2);border-radius:var(--radius-md);padding:1rem;margin-bottom:1.25rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:13px;color:var(--color-text-secondary)">Récapitulatif</span>
+        <span style="font-size:13px;font-weight:500">${fmtDuration(t.dateDepart,now)}</span>
+      </div>
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:3px">Départ : ${fmtTime(t.dateDepart)} → Retour : ${fmtTime(now)}</div>
+      <div style="font-size:13px;color:var(--color-text-secondary)">${t.conducteur} — ${rLabel}</div>
+    </div>
+    <div class="mb-4">
+      <label class="field-label" style="margin-bottom:8px">Anomalie constatée ?</label>
+      <div style="display:flex;gap:8px">
+        <button class="anomaly-btn ${state.hasAnomaly===false?"no-active":""}" onclick="setAnomaly(false)">✓ Non, RAS</button>
+        <button class="anomaly-btn ${state.hasAnomaly===true?"yes-active":""}" onclick="setAnomaly(true)">⚠ Oui</button>
+      </div>
+    </div>
+    <div id="anomalyField" class="${state.hasAnomaly===true?"":"hidden"} mb-4">
+      <label class="field-label">Décrivez l'anomalie</label>
+      <textarea id="anomalyInput" placeholder="Ex : voyant moteur allumé, pneu à plat..." rows="3" style="resize:vertical" oninput="state.anomalyText=this.value">${state.anomalyText}</textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="goBack()">Retour</button>
+      <button class="btn-primary" id="btnConfirm" onclick="confirmEnd()" ${state.hasAnomaly===null?"disabled":""}>Confirmer la fin</button>
+    </div>
+  `;
+}
+
+function setAnomaly(val) {
+  state.hasAnomaly=val;
+  document.querySelectorAll(".anomaly-btn").forEach(b=>b.className="anomaly-btn");
+  if(val===false) document.querySelectorAll(".anomaly-btn")[0].classList.add("no-active");
+  if(val===true)  document.querySelectorAll(".anomaly-btn")[1].classList.add("yes-active");
+  el("anomalyField").classList.toggle("hidden",!val);
+  el("btnConfirm").disabled=false;
+}
+
+async function confirmEnd() {
+  if (state.hasAnomaly===null) return;
+  const btn=el("btnConfirm"); if(btn){btn.disabled=true;btn.textContent="Enregistrement...";}
+  try {
+    await closeTrip(state.activeTrip.id, state.hasAnomaly, state.anomalyText);
+    state._confirmation={hasAnomaly:state.hasAnomaly};
+    if (state.vehicle) state.activeVehicleIds.delete(state.vehicle.id);
+    if (state.activeTrip?.conducteur) state.activeConducteurs.delete(state.activeTrip.conducteur);
+    state.activeTrip=null;
+    state.screen="confirmed"; render();
+    setTimeout(()=>{ state.screen="home"; state.vehicle=null; state.mode=null; state.homeActiveTrips=null; render(); }, 3000);
+  } catch(e) {
+    alert("Erreur lors de la clôture du trajet.");
+    if(btn){btn.disabled=false;btn.textContent="Confirmer la fin";}
+  }
+}
+
+// ============================================================
+// CONFIRME
+// ============================================================
+function renderConfirmed() {
+  const c=state._confirmation;
+  el("screenConfirmed").innerHTML = `
+    <div class="confirm-screen">
+      <div class="confirm-icon">✓</div>
+      <div class="confirm-title">Trajet enregistré !</div>
+      <div class="confirm-sub">${c?.hasAnomaly?"⚠️ Anomalie signalée.":"Aucune anomalie."}</div>
+    </div>`;
+}
+
+// ============================================================
+// HISTORIQUE
+// ============================================================
+async function loadAndRenderHistory() {
+  el("screenHistory").innerHTML = `<div class="spinner"></div><p style="text-align:center;font-size:14px;color:var(--color-text-secondary)">Chargement...</p>`;
+  try { state.trips = await getAllTrips(); renderHistory(); }
+  catch(e) { el("screenHistory").innerHTML=`<p style="text-align:center;padding:2rem;font-size:13px;color:var(--color-text-secondary)">Erreur de chargement.</p>`; }
+}
+
+function renderHistory() {
+  const searchEl = el("searchInput");
+  const search = (searchEl?.value || "").toLowerCase();
+  const filtered = state.trips.filter(t =>
+    !search || t.conducteur.toLowerCase().includes(search) || t.motif.toLowerCase().includes(search) ||
+    (search === "oui" && t.anomalie) || (search === "non" && !t.anomalie) || fmtDate(t.dateDepart).includes(search)
+  );
+
+  const resultsHtml = filtered.length === 0
+    ? `<p style="text-align:center;padding:2rem;font-size:13px;color:var(--color-text-tertiary)">Aucun résultat</p>`
+    : filtered.map(t => {
+        const rIcon = t.anomalie ? "⚠️" : (REASONS.find(r => r.id === t.motif)?.icon || "📋");
+        const rLabel = REASONS.find(r => r.id === t.motif)?.label || t.motif;
+        return `
+          <div class="history-item" onclick="showDetail('${t.id}')">
+            <div class="history-icon" style="background:${t.anomalie ? "var(--red-bg)" : "var(--color-bg-2)"}">${rIcon}</div>
+            <div style="flex:1;min-width:0">
+              <div class="history-name">${t.conducteur}</div>
+              <div class="history-meta">${rLabel}${t.anomalie ? ' · <span style="color:var(--red)">Anomalie</span>' : ""}</div>
+            </div>
+            <div class="history-right">
+              <div class="history-date">${fmtDate(t.dateDepart)}</div>
+              <div class="history-time">${fmtTime(t.dateDepart)}${t.dateRetour ? " · " + fmtDuration(t.dateDepart, t.dateRetour) : ""}</div>
+            </div>
+          </div>`;
+      }).join("");
+
+  // Si le champ de recherche existe déjà, ne mettre à jour que les résultats
+  const resultsEl = el("historyResults");
+  if (resultsEl && searchEl) {
+    resultsEl.innerHTML = `<div class="history-count">${filtered.length} trajet${filtered.length > 1 ? "s" : ""}</div>` + resultsHtml;
+  } else {
+    el("screenHistory").innerHTML = `
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" value="${search}" placeholder="Conducteur, motif, date, oui/non..." oninput="renderHistory()">
+      </div>
+      <div id="historyResults">
+        <div class="history-count">${filtered.length} trajet${filtered.length > 1 ? "s" : ""}</div>
+        ${resultsHtml}
+      </div>
+    `;
+  }
+}
+
+function showDetail(tripId) {
+  const t=state.trips.find(x=>x.id===tripId);
+  if (!t||!t.anomalie) return;
+  el("detailOverlay").innerHTML=`<div class="overlay" onclick="closeDetail()"></div>`;
+  el("detailPanel").innerHTML=`
+    <div class="detail-panel">
+      <div class="panel-handle"></div>
+      <div class="panel-title">⚠️ Anomalie signalée</div>
+      <div class="panel-meta">${t.conducteur} — ${fmtDate(t.dateDepart)} à ${fmtTime(t.dateDepart)}</div>
+      <div class="panel-desc">${t.descAnomalie||"Aucune description fournie."}</div>
+      <button class="btn-close-panel" onclick="closeDetail()">Fermer</button>
+    </div>`;
+  show("detailOverlay"); show("detailPanel");
+}
+function closeDetail() { hide("detailOverlay"); hide("detailPanel"); }
+
+// Init
+try {
+  render();
+} catch(e) {
+  var errDiv = document.createElement('div');
+  errDiv.style.cssText = 'padding:2rem 1rem;text-align:center';
+  errDiv.innerHTML = '<p style="color:#D85A30;font-weight:500;margin-bottom:8px">Erreur au démarrage</p>' +
+    '<p style="font-size:12px;color:#888;word-break:break-all">' + e.message + '</p>';
+  document.querySelector('.app').appendChild(errDiv);
+  console.error("Init error:", e);
+}
+</script>
+</body>
+</html>
