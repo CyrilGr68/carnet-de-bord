@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Carnet de bord — Véhicules</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Borne de recharge — Suivi</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --font-sans: 'DM Sans', -apple-system, sans-serif;
@@ -24,6 +24,12 @@
     --green: #1D9E75;
     --green-bg: #E1F5EE;
     --green-dark: #085041;
+    --blue: #2563EB;
+    --blue-bg: #EFF6FF;
+    --blue-dark: #1E3A5F;
+    --amber: #D97706;
+    --amber-bg: #FFFBEB;
+    --amber-dark: #78350F;
     --red: #D85A30;
     --red-bg: #FAECE7;
     --red-dark: #712B13;
@@ -40,6 +46,10 @@
       --color-border-light: #2e2e2e;
       --green-bg: #0d2e24;
       --green-dark: #8ee4c0;
+      --blue-bg: #1a2744;
+      --blue-dark: #93bbfc;
+      --amber-bg: #2e2510;
+      --amber-dark: #fcd580;
       --red-bg: #2e1a14;
       --red-dark: #f0a080;
     }
@@ -47,6 +57,7 @@
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   body { font-family:var(--font-sans); background:var(--color-bg); color:var(--color-text-primary); min-height:100vh; -webkit-font-smoothing:antialiased; overscroll-behavior:none; }
   .app { max-width:420px; margin:0 auto; padding:1.25rem 1rem 3rem; padding:calc(1.25rem + env(safe-area-inset-top, 0px)) 1rem calc(3rem + env(safe-area-inset-bottom, 0px)); }
+
   input, textarea, select {
     font-family:var(--font-sans); font-size:16px; padding:0.75rem 0.85rem;
     border:1px solid var(--color-border-light); border-radius:var(--radius-md);
@@ -54,7 +65,7 @@
     outline:none; transition:border-color 0.15s; width:100%;
     -webkit-appearance:none; appearance:none;
   }
-  input:focus, textarea:focus, select:focus { border-color:var(--green); }
+  input:focus, textarea:focus, select:focus { border-color:var(--blue); }
   button {
     font-family:var(--font-sans); font-size:14px;
     border:1px solid var(--color-border-light); border-radius:var(--radius-md);
@@ -68,141 +79,165 @@
   .header-title { font-size:17px; font-weight:600; letter-spacing:-0.3px; }
   .header-sub { font-size:12px; color:var(--color-text-tertiary); margin-top:2px; }
 
-  /* Page de garde */
+  /* Commun */
+  .field-label { display:block; font-size:13px; color:var(--color-text-secondary); margin-bottom:6px; font-weight:500; }
+  .mb-3 { margin-bottom:0.75rem; }
+  .mb-4 { margin-bottom:1rem; }
+  .hidden { display:none !important; }
+  .spinner { width:36px; height:36px; border:3px solid var(--color-border-light); border-top-color:var(--blue); border-radius:50%; margin:2rem auto; animation:spin 0.7s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  @keyframes glow { 0%,100%{ box-shadow:0 0 20px rgba(37,99,235,0.15); } 50%{ box-shadow:0 0 35px rgba(37,99,235,0.3); } }
+
+  /* Login */
+  .login-screen { padding:1.5rem 0; }
+  .login-logo { font-size:52px; text-align:center; margin-bottom:1rem; }
+  .login-title { font-size:22px; font-weight:600; text-align:center; margin-bottom:4px; letter-spacing:-0.5px; }
+  .login-sub { font-size:14px; color:var(--color-text-secondary); text-align:center; margin-bottom:2rem; line-height:1.6; }
+  .pin-input { text-align:center; font-family:var(--font-mono); font-size:24px; letter-spacing:12px; padding:0.85rem 1rem; }
+  .btn-login { display:block; width:100%; padding:1rem; background:var(--blue); color:#fff; border:none; border-radius:var(--radius-md); font-weight:500; font-size:15px; cursor:pointer; }
+  .btn-login:hover { opacity:0.9; background:var(--blue); }
+  .btn-login:disabled { background:var(--color-bg-3); color:var(--color-text-tertiary); cursor:default; opacity:1; }
+  .login-error { background:var(--red-bg); color:var(--red-dark); padding:0.7rem 1rem; border-radius:var(--radius-md); font-size:13px; text-align:center; margin-top:0.75rem; }
+
+  /* Accueil */
   .welcome-screen { text-align:center; padding:2rem 0; }
-  .welcome-logo { font-size:52px; margin-bottom:1rem; }
-  .welcome-title { font-size:22px; font-weight:600; margin-bottom:6px; letter-spacing:-0.5px; }
-  .welcome-sub { font-size:14px; color:var(--color-text-secondary); margin-bottom:2.5rem; line-height:1.6; }
+  .welcome-avatar { width:56px; height:56px; border-radius:50%; background:var(--blue-bg); display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-size:24px; }
+  .welcome-hello { font-size:14px; color:var(--color-text-secondary); margin-bottom:2px; }
+  .welcome-name { font-size:20px; font-weight:600; margin-bottom:1.75rem; letter-spacing:-0.3px; }
   .welcome-btn {
-    display:block; width:100%; padding:1.1rem 1rem;
+    display:flex; align-items:center; gap:14px; width:100%; padding:1.1rem 1rem;
     border-radius:var(--radius-lg); font-size:15px; font-weight:500;
     margin-bottom:12px; cursor:pointer; transition:all 0.2s; text-align:left;
-    display:flex; align-items:center; gap:14px;
   }
-  .welcome-btn-primary { background:var(--green); color:#fff; border:none; }
-  .welcome-btn-primary:hover { opacity:0.9; background:var(--green); }
+  .welcome-btn-primary { background:var(--blue); color:#fff; border:none; }
+  .welcome-btn-primary:hover { opacity:0.9; background:var(--blue); }
   .welcome-btn-secondary { background:var(--color-bg-2); color:var(--color-text-primary); border:1px solid var(--color-border-light); }
   .welcome-btn-secondary:hover { background:var(--color-bg-3); }
+  .welcome-btn-logout { background:transparent; color:var(--color-text-tertiary); border:none; font-size:13px; margin-top:0.5rem; min-height:36px; }
   .btn-icon-circle { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
-  .btn-icon-circle-green { background:rgba(255,255,255,0.2); }
+  .btn-icon-circle-blue { background:rgba(255,255,255,0.2); }
   .btn-icon-circle-gray { background:var(--color-bg-3); }
   .btn-text { flex:1; }
   .btn-label { display:block; font-size:15px; font-weight:500; }
   .btn-sub { display:block; font-size:12px; opacity:0.7; margin-top:2px; }
 
-  /* Trajet en cours sur accueil */
-  .home-active-banner {
-    background:var(--green-bg); border:1.5px solid var(--green);
-    border-radius:var(--radius-lg); padding:1rem 1.1rem;
-    margin-bottom:1.25rem; cursor:pointer; transition:all 0.15s;
-    display:flex; align-items:center; gap:12px;
+  /* Charge en cours */
+  .charging-banner {
+    background:var(--blue-bg); border-radius:var(--radius-lg);
+    padding:1.75rem 1.5rem; margin-bottom:1.25rem; text-align:center;
+    animation:glow 3s ease infinite;
   }
-  .home-active-banner:active { opacity:0.85; }
-  .home-active-dot { width:10px; height:10px; border-radius:50%; background:var(--green); flex-shrink:0; animation:pulse 1.5s ease infinite; }
-  .home-active-info { flex:1; min-width:0; }
-  .home-active-title { font-size:14px; font-weight:600; color:var(--green-dark); margin-bottom:2px; }
-  .home-active-meta { font-size:12px; color:var(--green-dark); opacity:0.8; }
-  .home-active-arrow { font-size:20px; color:var(--green); flex-shrink:0; }
-  .home-active-loading { text-align:center; padding:0.75rem; font-size:13px; color:var(--color-text-tertiary); }
-
-  /* Véhicules */
-  .vehicle-list { display:flex; flex-direction:column; gap:10px; }
-  .vehicle-card {
-    background:var(--color-bg); border:1px solid var(--color-border-light);
-    border-radius:var(--radius-lg); padding:0.9rem 1rem;
-    cursor:pointer; transition:all 0.15s;
-    display:flex; align-items:center; gap:14px;
+  .charging-label { font-size:14px; font-weight:500; color:var(--blue-dark); margin-bottom:0.5rem; }
+  .pulse-dot { display:inline-block; width:9px; height:9px; border-radius:50%; background:var(--blue); margin-right:8px; animation:pulse 1.5s ease infinite; }
+  .charging-elapsed { font-size:44px; font-weight:600; color:var(--blue-dark); font-family:var(--font-mono); letter-spacing:2px; margin-top:0.5rem; }
+  .charging-cost-box {
+    background:var(--amber-bg); border:1.5px solid var(--amber);
+    border-radius:var(--radius-lg); padding:1.1rem; margin-bottom:1.25rem; text-align:center;
   }
-  .vehicle-card:hover, .vehicle-card:active { border-color:var(--green); background:var(--green-bg); }
-  .vehicle-card-disabled { opacity:0.5; cursor:not-allowed !important; pointer-events:none; }
-  .vehicle-card-disabled:hover { border-color:var(--color-border-light); background:var(--color-bg); }
-  .vehicle-busy { font-size:11px; color:var(--red); font-weight:500; margin-top:2px; }
-  .vehicle-thumb {
-    width:52px; height:52px; border-radius:10px;
-    background:var(--color-bg-2); display:flex; align-items:center;
-    justify-content:center; font-size:24px; flex-shrink:0; overflow:hidden;
-  }
-  .vehicle-thumb img { width:100%; height:100%; object-fit:cover; }
-  .vehicle-info { flex:1; min-width:0; }
-  .vehicle-name { font-size:15px; font-weight:500; margin-bottom:3px; }
-  .vehicle-plate { font-size:12px; color:var(--color-text-tertiary); font-family:var(--font-mono); letter-spacing:0.5px; }
-
-  /* Info bar */
-  .info-bar { background:var(--color-bg-2); border-radius:var(--radius-md); padding:0.75rem 1rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:10px; }
-  .info-bar .v-name { font-size:14px; font-weight:500; }
-  .info-bar .v-plate { font-size:12px; color:var(--color-text-secondary); font-family:var(--font-mono); }
-  .info-bar .v-right { margin-left:auto; text-align:right; }
-  .info-bar .v-date { font-size:13px; font-weight:500; }
-  .info-bar .v-time { font-size:12px; color:var(--color-text-secondary); }
-
-  .field-label { display:block; font-size:13px; color:var(--color-text-secondary); margin-bottom:6px; font-weight:500; }
-
-  /* Raisons */
-  .reason-grid { display:flex; gap:8px; flex-wrap:wrap; }
-  .reason-btn { flex:1 1 auto; min-width:70px; padding:0.85rem 0.5rem; border:1px solid var(--color-border-light); border-radius:var(--radius-md); background:var(--color-bg); cursor:pointer; text-align:center; transition:all 0.15s; min-height:44px; }
-  .reason-btn.active { border:2px solid var(--green); background:var(--green-bg); }
-  .reason-btn .r-icon { font-size:20px; margin-bottom:4px; }
-  .reason-btn .r-label { font-size:12px; font-weight:500; }
-  .reason-btn.active .r-label { color:var(--green-dark); }
-
-  /* Boutons */
-  .btn-row { display:flex; gap:8px; }
-  .btn-cancel { flex:1; padding:0.85rem; font-size:14px; }
-  .btn-primary { flex:2; padding:0.85rem; background:var(--green); color:#fff; border:none; border-radius:var(--radius-md); font-weight:500; font-size:15px; }
-  .btn-primary:hover { opacity:0.9; background:var(--green); }
-  .btn-primary:disabled { background:var(--color-bg-3); color:var(--color-text-tertiary); cursor:default; opacity:1; }
-
-  /* Actif */
-  .active-banner { background:var(--green-bg); border-radius:var(--radius-lg); padding:1.5rem; margin-bottom:1.25rem; text-align:center; }
-  .pulse-dot { display:inline-block; width:9px; height:9px; border-radius:50%; background:var(--green); margin-right:8px; animation:pulse 1.5s ease infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  .active-label { font-size:14px; font-weight:500; color:var(--green-dark); }
-  .active-elapsed { font-size:40px; font-weight:600; color:var(--green-dark); margin-top:0.75rem; font-family:var(--font-mono); letter-spacing:2px; }
+  .charging-cost-label { font-size:12px; color:var(--amber-dark); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+  .charging-cost-value { font-size:32px; font-weight:700; color:var(--amber-dark); font-family:var(--font-mono); }
+  .charging-cost-sub { font-size:11px; color:var(--amber-dark); opacity:0.7; margin-top:2px; }
   .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1.25rem; }
   .detail-card { background:var(--color-bg-2); border-radius:var(--radius-md); padding:0.75rem; }
   .detail-label { font-size:11px; color:var(--color-text-tertiary); margin-bottom:3px; text-transform:uppercase; letter-spacing:0.5px; }
   .detail-value { font-size:14px; font-weight:500; }
-  .btn-end { width:100%; padding:1rem; background:var(--red); color:#fff; border:none; border-radius:var(--radius-md); font-weight:500; font-size:15px; cursor:pointer; }
-  .btn-end:hover { opacity:0.9; background:var(--red); }
+  .btn-stop { width:100%; padding:1rem; background:var(--red); color:#fff; border:none; border-radius:var(--radius-md); font-weight:500; font-size:15px; cursor:pointer; }
+  .btn-stop:hover { opacity:0.9; background:var(--red); }
 
-  /* Anomalie */
-  .anomaly-btn { flex:1; padding:0.85rem; border:1px solid var(--color-border-light); border-radius:var(--radius-md); background:var(--color-bg); cursor:pointer; font-size:14px; font-weight:500; transition:all 0.15s; min-height:44px; }
-  .anomaly-btn.no-active { border:2px solid var(--green); background:var(--green-bg); color:var(--green-dark); }
-  .anomaly-btn.yes-active { border:2px solid var(--red); background:var(--red-bg); color:var(--red-dark); }
+  /* Récap */
+  .summary-screen { padding:1rem 0; }
+  .summary-icon { width:64px; height:64px; border-radius:50%; background:var(--green-bg); display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-size:28px; }
+  .summary-title { font-size:18px; font-weight:600; text-align:center; margin-bottom:0.25rem; }
+  .summary-sub { font-size:13px; color:var(--color-text-secondary); text-align:center; margin-bottom:1.5rem; }
+  .summary-card {
+    background:var(--color-bg-2); border-radius:var(--radius-lg); padding:1.25rem;
+    margin-bottom:1.25rem;
+  }
+  .summary-row { display:flex; justify-content:space-between; align-items:center; padding:0.5rem 0; }
+  .summary-row:not(:last-child) { border-bottom:1px solid var(--color-border-light); }
+  .summary-row-label { font-size:13px; color:var(--color-text-secondary); }
+  .summary-row-value { font-size:14px; font-weight:500; text-align:right; }
+  .summary-total { font-size:18px; font-weight:700; color:var(--blue); }
+  .btn-home { width:100%; padding:1rem; background:var(--blue); color:#fff; border:none; border-radius:var(--radius-md); font-weight:500; font-size:15px; cursor:pointer; }
+  .btn-home:hover { opacity:0.9; background:var(--blue); }
 
   /* Historique */
   .search-box { position:relative; margin-bottom:1rem; }
   .search-icon { position:absolute; left:0.7rem; top:50%; transform:translateY(-50%); font-size:14px; color:var(--color-text-tertiary); pointer-events:none; }
   .search-box input { padding-left:2.1rem; }
   .history-count { font-size:13px; color:var(--color-text-tertiary); margin-bottom:10px; }
-  .history-item { background:var(--color-bg); border:1px solid var(--color-border-light); border-radius:var(--radius-md); padding:0.7rem 0.85rem; display:flex; align-items:center; gap:10px; margin-bottom:6px; cursor:pointer; transition:background 0.1s; }
-  .history-item:hover, .history-item:active { background:var(--color-bg-2); }
-  .history-icon { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+  .history-item {
+    background:var(--color-bg); border:1px solid var(--color-border-light); border-radius:var(--radius-md);
+    padding:0.75rem 0.85rem; display:flex; align-items:center; gap:10px;
+    margin-bottom:6px; transition:background 0.1s;
+  }
+  .history-icon { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; background:var(--blue-bg); }
   .history-name { font-size:13px; font-weight:500; }
   .history-meta { font-size:11px; color:var(--color-text-tertiary); margin-top:1px; }
   .history-right { flex-shrink:0; text-align:right; }
   .history-date { font-size:12px; font-weight:500; }
-  .history-time { font-size:11px; color:var(--color-text-tertiary); }
+  .history-cost { font-size:12px; color:var(--blue); font-weight:600; font-family:var(--font-mono); }
 
-  /* Panel détail */
-  .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:90; }
-  .detail-panel { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:420px; background:var(--color-bg); border-radius:20px 20px 0 0; padding:1.5rem 1.25rem; padding-bottom:calc(1.5rem + env(safe-area-inset-bottom, 0px)); z-index:100; box-shadow:0 -4px 24px rgba(0,0,0,0.15); }
-  .panel-handle { width:36px; height:4px; background:var(--color-bg-3); border-radius:2px; margin:0 auto 1.25rem; }
-  .panel-title { font-size:15px; font-weight:600; color:var(--red-dark); margin-bottom:0.5rem; }
-  .panel-meta { font-size:13px; color:var(--color-text-secondary); margin-bottom:0.75rem; }
-  .panel-desc { font-size:14px; line-height:1.6; padding:0.75rem; background:var(--red-bg); border-radius:var(--radius-md); margin-bottom:1rem; }
-  .btn-close-panel { width:100%; padding:0.85rem; background:var(--color-bg-2); border-radius:var(--radius-md); font-size:14px; font-weight:500; min-height:44px; }
+  .btn-row { display:flex; gap:8px; }
+  .btn-back { flex:1; padding:0.85rem; font-size:14px; }
 
-  /* Confirmé */
-  .confirm-screen { text-align:center; padding:3rem 1rem; }
-  .confirm-icon { width:60px; height:60px; border-radius:50%; background:var(--green-bg); display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-size:26px; color:var(--green); font-weight:700; }
-  .confirm-title { font-size:17px; font-weight:600; margin-bottom:6px; }
-  .confirm-sub { font-size:13px; color:var(--color-text-secondary); }
+  /* Point de charge — disposition gauche/droite comme la borne physique */
+  .point-row { display:flex; gap:16px; align-items:stretch; }
+  .point-btn {
+    flex:1; padding:1.25rem 0.5rem; border:2px solid var(--color-border-light);
+    border-radius:var(--radius-lg); background:var(--color-bg); cursor:pointer;
+    text-align:center; transition:all 0.15s; min-height:80px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  }
+  .point-btn .point-number {
+    width:44px; height:44px; border-radius:50%; background:var(--color-bg-2);
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; font-weight:700; font-family:var(--font-mono); transition:all 0.15s;
+  }
+  .point-btn .point-label { font-size:11px; color:var(--color-text-tertiary); margin-top:2px; }
+  .point-btn.point-active { border-color:var(--blue); background:var(--blue-bg); }
+  .point-btn.point-active .point-number { background:var(--blue); color:#fff; }
+  .point-btn.point-active .point-label { color:var(--blue-dark); font-weight:500; }
+  .point-btn.point-busy { opacity:0.5; cursor:not-allowed; border-color:var(--color-border-light); background:var(--color-bg); }
+  .point-btn.point-busy .point-number { background:var(--color-bg-3); color:var(--color-text-tertiary); }
+  .point-btn.point-busy .point-label { color:var(--red); font-weight:500; }
+  .point-busy-user { font-size:10px; color:var(--red); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
 
-  .spinner { width:36px; height:36px; border:3px solid var(--color-border-light); border-top-color:var(--green); border-radius:50%; margin:2rem auto; animation:spin 0.7s linear infinite; }
-  @keyframes spin { to { transform:rotate(360deg); } }
-  .mb-4 { margin-bottom:1rem; }
-  .hidden { display:none !important; }
+  /* Dropdown recherche */
+  .search-select { position:relative; }
+  .search-select-trigger {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0.75rem 0.85rem; border:1px solid var(--color-border-light);
+    border-radius:var(--radius-md); background:var(--color-bg); cursor:pointer;
+    font-size:16px; min-height:48px; transition:border-color 0.15s;
+  }
+  .search-select-trigger.has-value { color:var(--color-text-primary); }
+  .search-select-trigger.no-value { color:var(--color-text-tertiary); }
+  .search-select-trigger:focus, .search-select-trigger.open { border-color:var(--blue); }
+  .search-select-arrow { font-size:12px; color:var(--color-text-tertiary); transition:transform 0.15s; }
+  .search-select-trigger.open .search-select-arrow { transform:rotate(180deg); }
+  .search-select-dropdown {
+    position:absolute; top:calc(100% + 4px); left:0; right:0;
+    background:var(--color-bg); border:1px solid var(--color-border);
+    border-radius:var(--radius-md); box-shadow:0 8px 24px rgba(0,0,0,0.12);
+    z-index:50; max-height:260px; display:flex; flex-direction:column;
+    overflow:hidden;
+  }
+  .search-select-search {
+    padding:0.65rem 0.85rem; border:none; border-bottom:1px solid var(--color-border-light);
+    font-size:15px; outline:none; background:var(--color-bg); color:var(--color-text-primary);
+    border-radius:0; width:100%;
+  }
+  .search-select-list { overflow-y:auto; flex:1; }
+  .search-select-option {
+    padding:0.7rem 0.85rem; font-size:15px; cursor:pointer;
+    transition:background 0.1s; border-bottom:1px solid var(--color-border-light);
+  }
+  .search-select-option:last-child { border-bottom:none; }
+  .search-select-option:hover, .search-select-option:active { background:var(--blue-bg); }
+  .search-select-option.selected { color:var(--blue); font-weight:500; }
+  .search-select-empty { padding:1rem; text-align:center; font-size:13px; color:var(--color-text-tertiary); }
 </style>
 
 <!--[if gte mso 9]><xml>
@@ -218,87 +253,73 @@
 <div class="app">
   <div class="header">
     <div>
-      <div class="header-title">🚐 Carnet de bord</div>
-      <div class="header-sub" id="headerSub">Gestion des véhicules</div>
+      <div class="header-title">⚡ Borne de recharge</div>
+      <div class="header-sub" id="headerSub">Identification</div>
     </div>
     <div id="headerBack" class="hidden">
       <button onclick="goBack()" style="padding:10px 18px;font-size:14px">← Retour</button>
     </div>
   </div>
 
-  <div id="screenHome"></div>
-  <noscript>
-    <div style="text-align:center;padding:2rem 1rem">
-      <p style="font-size:15px;font-weight:500;margin-bottom:8px">JavaScript requis</p>
-      <p style="font-size:13px;color:#666;line-height:1.6">
-        Cette application nécessite un navigateur.<br>
-        Sur iPhone : appuyez sur <b>Partager</b> (⬆️) puis <b>Ouvrir dans Safari</b>.
-      </p>
-    </div>
-  </noscript>
-  <div id="screenScan" class="hidden"></div>
-  <div id="screenStart" class="hidden"></div>
-  <div id="screenActive" class="hidden"></div>
+  <div id="screenLogin"></div>
+  <div id="screenHome" class="hidden"></div>
+  <div id="screenCharging" class="hidden"></div>
   <div id="screenEnd" class="hidden"></div>
-  <div id="screenConfirmed" class="hidden"></div>
+  <div id="screenSummary" class="hidden"></div>
   <div id="screenHistory" class="hidden"></div>
-  <div id="detailOverlay" class="hidden"></div>
-  <div id="detailPanel" class="hidden"></div>
 </div>
 
 <script>
 // ============================================================
-// CONFIG — remplace TON_TOKEN_ICI par ton Personal Access Token
+// CONFIG AIRTABLE
 // ============================================================
 const AIRTABLE_TOKEN = "patfxRbzwpYU6ovpN.b3a0edd9d1e8417fddf7f3734bb67569375a0861e9dfec3c766415362cc29862";
-const BASE_ID       = "app2Zz2G7FGpd8ws2";
-const TBL_VEHICULES  = "tblcjkGFzkuEjBUto";
-const TBL_TRAJETS    = "tblTO6Ht4G9KBgJ1S";
-const TBL_CONDUCTEURS = "tblcgQovDKM3b2YIQ";
-const F_C_NOM = "fldR7sgc8GKgYC3qJ";
-const F = {
-  V_NOM:          "fldedsm7pYfFfaXV1",
-  V_IMMAT:        "fld98AkS9tVUYHR8y",
-  V_PHOTO:        "fldm40w3wOM96DSrS",
-  T_CONDUCTEUR:   "fldVIenVUkULxPMtv",
-  T_MOTIF:        "fldf2sVxXN6bJQLIQ",
-  T_DATE_DEPART:  "fldlPbYt4j2TVWlbx",
-  T_DATE_RETOUR:  "fldHHhmH5n2r5QGRe",
-  T_ANOMALIE:     "fldnTbLr9q8TDFkXh",
-  T_DESC_ANOMALIE:"fldQDmlGEPA0gmGG2",
-  T_VEHICULE:     "fldsrqlgNVwMwQ2tf",
-};
+const BASE_ID        = "app2Zz2G7FGpd8ws2";
+const TBL_USERS      = "tbliIt8NvjctJtp5O";
+const TBL_CHARGES    = "tblvDQJ3s3hPnh2S0";
 
-const REASONS = [
-  { id:"livraison",    label:"Livraison",    icon:"📦" },
-  { id:"intervention", label:"Intervention", icon:"🔧" },
-  { id:"garage",       label:"Garage",       icon:"🏗️" },
-  { id:"autre",        label:"Autre",        icon:"📋" }
-];
-
-let CONDUCTEURS = [];
+// Coût = 0.20 €/kWh × 11 kW / 60 min = 0.036667 €/min
+const COST_PER_MINUTE = 0.20 * (11 / 60);
+const COST_PER_KWH = 0.20;
 
 let state = {
-  screen:"home", mode:null, vehicle:null, activeTrip:null,
-  vehicles:[], trips:[], activeVehicleIds:new Set(), activeConducteurs:new Set(),
-  homeActiveTrips:null, homeLoading:false,
-  selectedEmployee:"", selectedReason:"",
-  hasAnomaly:null, anomalyText:"",
-  elapsedInterval:null,
+  screen: "login",
+  users: [],
+  currentUser: null,        // { id, nom }
+  selectedUserName: "",
+  pin: "",
+  loginError: "",
+  // Point de charge
+  selectedPoint: "",         // "Point 1" ou "Point 2"
+  busyPoints: [],            // [{ point, utilisateur }]
+  busyLoading: false,
+  // Charge en cours
+  chargeStartTime: null,
+  chargeRecordId: null,
+  elapsedInterval: null,
+  // Fin de charge
+  endDureeMin: 0,
+  endCostEstime: 0,
+  compteurKwh: "",
+  previousCompteur: null,
+  // Récap
+  summary: null,
+  // Historique
+  history: [],
 };
 
 // ============================================================
-// API
+// API AIRTABLE
 // ============================================================
-async function api(path, options={}) {
+async function api(path, options = {}) {
   const url = `https://api.airtable.com/v0/${BASE_ID}/${path}`;
   const res = await fetch(url, {
     ...options,
     mode: "cors",
-    headers:{
-      "Authorization":`Bearer ${AIRTABLE_TOKEN}`,
-      "Content-Type":"application/json",
-      ...(options.headers||{})
+    headers: {
+      "Authorization": `Bearer ${AIRTABLE_TOKEN}`,
+      "Content-Type": "application/json",
+      ...(options.headers || {})
     }
   });
   if (!res.ok) {
@@ -309,95 +330,108 @@ async function api(path, options={}) {
   return res.json();
 }
 
-async function getConducteurs() {
-  const d = await api(`${TBL_CONDUCTEURS}?fields[]=Nom&sort[0][field]=Nom&sort[0][direction]=asc`);
-  return d.records.map(r => r.fields["Nom"] || "").filter(Boolean);
-}
-
-async function getVehicles() {
-  const d = await api(`${TBL_VEHICULES}?fields[]=Nom&fields[]=Immatriculation&fields[]=Photo`);
-  return d.records.map(r=>({ id:r.id, name:r.fields["Nom"]||"", plate:r.fields["Immatriculation"]||"", photo:r.fields["Photo"]?.[0]?.url||null }));
-}
-
-async function getActiveTrip(vehicleId) {
-  const formula = encodeURIComponent(`AND(FIND("${vehicleId}",ARRAYJOIN({Véhicule},",")),{DateRetour}="")`);
-  const d = await api(`${TBL_TRAJETS}?filterByFormula=${formula}&maxRecords=1`);
-  if (!d.records.length) return null;
-  const r = d.records[0];
-  return { id:r.id, conducteur:r.fields["Conducteur"]||"", motif:r.fields["MotifTrajet"]||"", dateDepart:r.fields["DateDepart"]||null };
-}
-
-async function createTrip(vehicleId, conducteur, motif) {
-  return api(TBL_TRAJETS, { method:"POST", body:JSON.stringify({
-    fields:{
-      "Conducteur": conducteur,
-      "MotifTrajet": motif,
-      "DateDepart": new Date().toISOString(),
-      "Véhicule": [vehicleId],
-      "Anomalie": false
-    },
-    typecast: true
-  })});
-}
-
-async function closeTrip(recordId, hasAnomaly, anomalyText) {
-  const fields = { "DateRetour": new Date().toISOString(), "Anomalie": hasAnomaly };
-  if (hasAnomaly && anomalyText) fields["DescriptionAnomalie"] = anomalyText;
-  return api(`${TBL_TRAJETS}/${recordId}`, { method:"PATCH", body:JSON.stringify({ fields }) });
-}
-
-async function getActiveResources() {
-  const formula = encodeURIComponent(`{DateRetour}=""`);
-  const d = await api(`${TBL_TRAJETS}?filterByFormula=${formula}&fields[]=Véhicule&fields[]=Conducteur`);
-  const vehicleIds = new Set();
-  const conducteurs = new Set();
-  d.records.forEach(r => {
-    const vIds = r.fields["Véhicule"];
-    if (Array.isArray(vIds)) vIds.forEach(id => vehicleIds.add(id));
-    if (r.fields["Conducteur"]) conducteurs.add(r.fields["Conducteur"]);
-  });
-  return { vehicleIds, conducteurs };
-}
-
-async function getAllActiveTrips() {
-  const formula = encodeURIComponent(`{DateRetour}=""`);
-  const d = await api(`${TBL_TRAJETS}?filterByFormula=${formula}&fields[]=Conducteur&fields[]=MotifTrajet&fields[]=DateDepart&fields[]=Véhicule`);
+async function getUsers() {
+  const d = await api(`${TBL_USERS}?fields[]=Nom&fields[]=CodePIN&sort[0][field]=Nom&sort[0][direction]=asc`);
   return d.records.map(r => ({
     id: r.id,
-    conducteur: r.fields["Conducteur"] || "",
-    motif: r.fields["MotifTrajet"] || "",
-    dateDepart: r.fields["DateDepart"] || null,
-    vehicleId: r.fields["Véhicule"]?.[0] || null
+    nom: r.fields["Nom"] || "",
+    pin: r.fields["CodePIN"] || ""
+  })).filter(u => u.nom);
+}
+
+async function getBusyPoints() {
+  const formula = encodeURIComponent(`AND({DateFin}="",{Utilisateur}!="INITIAL")`);
+  const d = await api(`${TBL_CHARGES}?filterByFormula=${formula}&fields[]=PointDeCharge&fields[]=Utilisateur`);
+  return d.records.map(r => ({
+    point: r.fields["PointDeCharge"] || "",
+    utilisateur: r.fields["Utilisateur"] || ""
   }));
 }
 
-async function getAllTrips() {
-  const d = await api(`${TBL_TRAJETS}?sort[0][field]=DateDepart&sort[0][direction]=desc&maxRecords=200`);
-  return d.records.map(r=>({
-    id:r.id,
-    conducteur:r.fields["Conducteur"]||"",
-    motif:r.fields["MotifTrajet"]||"",
-    dateDepart:r.fields["DateDepart"]||null,
-    dateRetour:r.fields["DateRetour"]||null,
-    anomalie:r.fields["Anomalie"]||false,
-    descAnomalie:r.fields["DescriptionAnomalie"]||""
+async function getActiveChargeForUser(userName) {
+  const formula = encodeURIComponent(`AND({Utilisateur}="${userName}",{DateFin}="")`);
+  const d = await api(`${TBL_CHARGES}?filterByFormula=${formula}&maxRecords=1&fields[]=DateDebut&fields[]=PointDeCharge`);
+  if (!d.records.length) return null;
+  const r = d.records[0];
+  return { id: r.id, dateDebut: r.fields["DateDebut"] || null, point: r.fields["PointDeCharge"] || "" };
+}
+
+async function createCharge(userName, point) {
+  return api(TBL_CHARGES, {
+    method: "POST",
+    body: JSON.stringify({
+      fields: {
+        "Utilisateur": userName,
+        "DateDebut": new Date().toISOString(),
+        "PointDeCharge": point
+      },
+      typecast: true
+    })
+  });
+}
+
+async function getLastCompteur(point) {
+  const formula = encodeURIComponent(`AND({PointDeCharge}="${point}",{CompteurKwh}>0)`);
+  const d = await api(`${TBL_CHARGES}?filterByFormula=${formula}&sort[0][field]=DateDebut&sort[0][direction]=desc&maxRecords=1&fields[]=CompteurKwh`);
+  if (!d.records.length) return null;
+  return d.records[0].fields["CompteurKwh"] || null;
+}
+
+async function closeCharge(recordId, dureeMinutes, coutEstime, compteurKwh, consoReelle, coutReel) {
+  const fields = {
+    "DateFin": new Date().toISOString(),
+    "DureeMinutes": dureeMinutes,
+    "CoutEstime": coutEstime
+  };
+  if (compteurKwh !== null && compteurKwh !== undefined) {
+    fields["CompteurKwh"] = compteurKwh;
+  }
+  if (consoReelle !== null && consoReelle !== undefined) {
+    fields["ConsoReelle"] = consoReelle;
+  }
+  if (coutReel !== null && coutReel !== undefined) {
+    fields["CoutReel"] = coutReel;
+  }
+  return api(`${TBL_CHARGES}/${recordId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ fields })
+  });
+}
+
+async function getUserCharges(userName) {
+  const formula = encodeURIComponent(`AND({Utilisateur}="${userName}",{Utilisateur}!="INITIAL")`);
+  const d = await api(`${TBL_CHARGES}?filterByFormula=${formula}&sort[0][field]=DateDebut&sort[0][direction]=desc&maxRecords=100`);
+  return d.records.map(r => ({
+    id: r.id,
+    dateDebut: r.fields["DateDebut"] || null,
+    dateFin: r.fields["DateFin"] || null,
+    duree: r.fields["DureeMinutes"] || 0,
+    cout: r.fields["CoutEstime"] || 0,
+    compteur: r.fields["CompteurKwh"] || null,
+    consoReelle: r.fields["ConsoReelle"] || null,
+    point: r.fields["PointDeCharge"] || ""
   }));
 }
 
 // ============================================================
 // FORMAT
 // ============================================================
-const fmtDate = d => d ? new Date(d).toLocaleDateString("fr-FR",{day:"2-digit",month:"2-digit",year:"numeric"}) : "—";
-const fmtTime = d => d ? new Date(d).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}) : "—";
-function fmtDuration(s,e) {
-  if (!s||!e) return "—";
-  const mins=Math.round((new Date(e)-new Date(s))/60000);
-  const h=Math.floor(mins/60),m=mins%60;
-  return h===0?`${m} min`:`${h}h${String(m).padStart(2,"0")}`;
+const fmtDate = d => d ? new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" }) : "—";
+const fmtTime = d => d ? new Date(d).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "—";
+function fmtDuration(mins) {
+  if (!mins) return "—";
+  const h = Math.floor(mins / 60), m = Math.round(mins % 60);
+  return h === 0 ? `${m} min` : `${h}h${String(m).padStart(2, "0")}`;
+}
+function fmtCost(val) {
+  return Number(val).toFixed(2).replace(".", ",") + " €";
 }
 function elapsed(t) {
-  const s=Math.floor((Date.now()-new Date(t))/1000);
-  return `${String(Math.floor(s/3600)).padStart(2,"0")}:${String(Math.floor((s%3600)/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+  const s = Math.floor((Date.now() - new Date(t)) / 1000);
+  return `${String(Math.floor(s / 3600)).padStart(2, "0")}:${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+}
+function elapsedMinutes(t) {
+  return (Date.now() - new Date(t)) / 60000;
 }
 
 // ============================================================
@@ -405,8 +439,11 @@ function elapsed(t) {
 // ============================================================
 const show = id => document.getElementById(id).classList.remove("hidden");
 const hide = id => document.getElementById(id).classList.add("hidden");
-const el   = id => document.getElementById(id);
-function hideAll() { ["screenHome","screenScan","screenStart","screenActive","screenEnd","screenConfirmed","screenHistory"].forEach(hide); }
+const el = id => document.getElementById(id);
+
+function hideAll() {
+  ["screenLogin", "screenHome", "screenCharging", "screenEnd", "screenSummary", "screenHistory"].forEach(hide);
+}
 
 function setHeader(sub, showBack) {
   el("headerSub").textContent = sub;
@@ -415,458 +452,679 @@ function setHeader(sub, showBack) {
 
 function goBack() {
   if (state.elapsedInterval) clearInterval(state.elapsedInterval);
-  const prev = { scan:"home", start:"scan", end:"active", history:"home" };
-  state.screen = prev[state.screen] || "home";
-  if (state.screen === "home") { state.vehicle=null; state.mode=null; state.homeActiveTrips=null; }
+  if (state.screen === "history") {
+    state.screen = "home";
+  } else if (state.screen === "charging" || state.screen === "end") {
+    // On ne peut pas revenir en arrière pendant une charge
+    return;
+  } else {
+    state.screen = "home";
+  }
   render();
 }
 
 function render() {
   hideAll();
   const screens = {
-    home:      ["Gestion des véhicules",    false, renderHome,      "screenHome"],
-    scan:      [state.mode==="trip"?"Choisir un véhicule":"Choisir un véhicule", true, renderScan, "screenScan"],
-    start:     [state.vehicle?.name||"",   true,  renderStart,     "screenStart"],
-    active:    ["Trajet en cours",          false, renderActive,    "screenActive"],
-    end:       ["Fin de trajet",            false, renderEnd,       "screenEnd"],
-    confirmed: ["Confirmé",                 false, renderConfirmed, "screenConfirmed"],
-    history:   ["Historique des trajets",   true,  renderHistory,   "screenHistory"],
+    login:    ["Identification",       false, renderLogin,    "screenLogin"],
+    home:     [state.currentUser ? `Bonjour ${state.currentUser.nom}` : "Accueil", false, renderHome, "screenHome"],
+    charging: ["Recharge en cours",    false, renderCharging, "screenCharging"],
+    end:      ["Fin de recharge",      false, renderEnd,      "screenEnd"],
+    summary:  ["Recharge terminée",    false, renderSummary,  "screenSummary"],
+    history:  ["Mon historique",        true,  renderHistory,  "screenHistory"],
   };
-  const [sub, back, fn, screenId] = screens[state.screen] || screens.home;
+  const [sub, back, fn, screenId] = screens[state.screen] || screens.login;
   setHeader(sub, back);
   fn();
   show(screenId);
 }
 
 // ============================================================
-// PAGE DE GARDE
+// ECRAN LOGIN
 // ============================================================
-function renderHome() {
-  const activeHtml = buildActiveTripsHtml();
-  el("screenHome").innerHTML = `
-    <div class="welcome-screen">
-      <div class="welcome-logo">🚐</div>
-      <div class="welcome-title">Carnet de bord</div>
-      <div class="welcome-sub">Que souhaitez-vous faire ?</div>
-      <div id="homeActiveZone">${activeHtml}</div>
-      <button class="welcome-btn welcome-btn-primary" onclick="startMode('trip')">
-        <div class="btn-icon-circle btn-icon-circle-green">🚀</div>
-        <div class="btn-text">
-          <span class="btn-label">Démarrer un trajet</span>
-          <span class="btn-sub">Enregistrer une nouvelle sortie</span>
+function renderLogin() {
+  el("screenLogin").innerHTML = `
+    <div class="login-screen">
+      <div class="login-logo">⚡</div>
+      <div class="login-title">Borne de recharge</div>
+      <div class="login-sub">Identifiez-vous pour démarrer</div>
+
+      <div class="mb-4">
+        <label class="field-label">Votre nom</label>
+        <div class="search-select" id="userDropdown">
+          <div class="search-select-trigger ${state.selectedUserName ? 'has-value' : 'no-value'}"
+               onclick="toggleUserDropdown()" id="userTrigger">
+            <span>${state.selectedUserName || "Rechercher un nom..."}</span>
+            <span class="search-select-arrow">▼</span>
+          </div>
         </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="field-label">Code personnel</label>
+        <input type="password" inputmode="numeric" maxlength="6" id="pinInput" class="pin-input"
+               placeholder="····" value="${state.pin}"
+               oninput="onPinInput(this.value)"
+               onkeydown="if(event.key==='Enter') doLogin()">
+      </div>
+
+      <button class="btn-login" id="btnLogin" onclick="doLogin()"
+              ${!(state.selectedUserName && state.pin) ? "disabled" : ""}>
+        Se connecter
       </button>
-      <button class="welcome-btn welcome-btn-secondary" onclick="startMode('history')">
-        <div class="btn-icon-circle btn-icon-circle-gray">📋</div>
-        <div class="btn-text">
-          <span class="btn-label">Consulter l'historique</span>
-          <span class="btn-sub">Voir tous les trajets passés</span>
-        </div>
-      </button>
+
+      ${state.loginError ? `<div class="login-error">${state.loginError}</div>` : ""}
     </div>
   `;
-  // Charge les trajets actifs en arrière-plan si pas encore chargés
-  if (state.homeActiveTrips === null && !state.homeLoading) {
-    loadHomeActiveTrips();
-  }
+
+  // Charger les utilisateurs si pas encore fait
+  if (!state.users.length) loadUsers();
 }
 
-function buildActiveTripsHtml() {
-  if (state.homeLoading) {
-    return `<div class="home-active-loading">Vérification des trajets en cours...</div>`;
-  }
-  if (!state.homeActiveTrips || state.homeActiveTrips.length === 0) return "";
-  return state.homeActiveTrips.map(t => {
-    const rLabel = REASONS.find(r=>r.id===t.motif)?.label || t.motif;
-    const vName = t.vehicleName || "Véhicule";
-    const dur = t.dateDepart ? elapsed(t.dateDepart) : "";
-    return `
-      <div class="home-active-banner" onclick="resumeTrip('${t.id}')">
-        <div class="home-active-dot"></div>
-        <div class="home-active-info">
-          <div class="home-active-title">Trajet en cours — ${vName}</div>
-          <div class="home-active-meta">${t.conducteur} · ${rLabel} · ${dur}</div>
-        </div>
-        <div class="home-active-arrow">›</div>
-      </div>`;
-  }).join("");
-}
-
-async function loadHomeActiveTrips() {
-  state.homeLoading = true;
-  const zone = el("homeActiveZone");
-  if (zone) zone.innerHTML = buildActiveTripsHtml();
+async function loadUsers() {
   try {
-    const trips = await getAllActiveTrips();
-    // Charger les véhicules si pas encore fait pour avoir les noms
-    if (trips.length > 0 && !state.vehicles.length) {
-      const vehicles = await getVehicles();
-      state.vehicles = vehicles;
-    }
-    // Enrichir chaque trajet avec le nom du véhicule
-    state.homeActiveTrips = trips.map(t => ({
-      ...t,
-      vehicleName: state.vehicles.find(v=>v.id===t.vehicleId)?.name || "Véhicule inconnu",
-      vehiclePlate: state.vehicles.find(v=>v.id===t.vehicleId)?.plate || ""
-    }));
-  } catch(e) {
-    console.error("Erreur chargement trajets actifs:", e);
-    state.homeActiveTrips = [];
-  }
-  state.homeLoading = false;
-  const zone2 = el("homeActiveZone");
-  if (zone2) zone2.innerHTML = buildActiveTripsHtml();
-}
-
-async function resumeTrip(tripId) {
-  const t = state.homeActiveTrips?.find(x=>x.id===tripId);
-  if (!t) return;
-  // Trouver le véhicule
-  const v = state.vehicles.find(x=>x.id===t.vehicleId);
-  if (!v) { alert("Véhicule introuvable."); return; }
-  state.vehicle = v;
-  state.activeTrip = { id:t.id, conducteur:t.conducteur, motif:t.motif, dateDepart:t.dateDepart };
-  state.mode = "trip";
-  state.screen = "active";
-  render();
-}
-
-async function startMode(mode) {
-  state.mode = mode;
-  if (mode === "history") {
-    state.screen = "history";
-    render();
-    loadAndRenderHistory();
-  } else {
-    state.screen = "scan";
-    render();
-    // Toujours charger conducteurs + activeVehicleIds (même si véhicules déjà en cache)
-    if (!state.vehicles.length || !CONDUCTEURS.length) {
-      await loadVehicles();
-    } else {
-      // Véhicules et conducteurs déjà chargés, mais rafraîchir les trajets actifs
-      try {
-        const activeRes = await getActiveResources();
-        state.activeVehicleIds = activeRes.vehicleIds;
-        state.activeConducteurs = activeRes.conducteurs;
-      } catch(e) { console.error("Erreur refresh actifs:", e); }
-      renderScan();
-    }
+    state.users = await getUsers();
+  } catch (e) {
+    console.error("Erreur chargement utilisateurs:", e);
   }
 }
 
-// ============================================================
-// SELECTION VEHICULE
-// ============================================================
-function renderScan() {
-  if (!state.vehicles.length) {
-    el("screenScan").innerHTML = `<div class="spinner"></div><p style="text-align:center;font-size:14px;color:var(--color-text-secondary)">Chargement...</p>`;
+let dropdownOpen = false;
+
+function toggleUserDropdown() {
+  dropdownOpen ? closeUserDropdown() : openUserDropdown();
+}
+
+function openUserDropdown() {
+  dropdownOpen = true;
+  const container = el("userDropdown");
+  const trigger = el("userTrigger");
+  if (trigger) trigger.classList.add("open");
+
+  // Supprimer un dropdown existant
+  const existing = container.querySelector(".search-select-dropdown");
+  if (existing) existing.remove();
+
+  const dd = document.createElement("div");
+  dd.className = "search-select-dropdown";
+  dd.innerHTML = `
+    <input type="text" class="search-select-search" id="userSearchInput"
+           placeholder="Tapez un nom..." oninput="filterUserDropdown(this.value)" autocomplete="off">
+    <div class="search-select-list" id="userSearchList"></div>
+  `;
+  container.appendChild(dd);
+  filterUserDropdown("");
+  setTimeout(() => { const inp = el("userSearchInput"); if (inp) inp.focus(); }, 50);
+
+  // Fermer si clic en dehors
+  setTimeout(() => document.addEventListener("click", onClickOutsideDropdown, true), 10);
+}
+
+function closeUserDropdown() {
+  dropdownOpen = false;
+  const trigger = el("userTrigger");
+  if (trigger) trigger.classList.remove("open");
+  const container = el("userDropdown");
+  const dd = container?.querySelector(".search-select-dropdown");
+  if (dd) dd.remove();
+  document.removeEventListener("click", onClickOutsideDropdown, true);
+}
+
+function onClickOutsideDropdown(e) {
+  const container = el("userDropdown");
+  if (container && !container.contains(e.target)) closeUserDropdown();
+}
+
+function filterUserDropdown(search) {
+  const list = el("userSearchList");
+  if (!list) return;
+  const s = search.toLowerCase();
+  const filtered = state.users.filter(u => !s || u.nom.toLowerCase().includes(s));
+  if (!filtered.length) {
+    list.innerHTML = `<div class="search-select-empty">Aucun résultat</div>`;
     return;
   }
-  el("screenScan").innerHTML = `
-    <p style="font-size:14px;color:var(--color-text-secondary);margin-bottom:1.25rem">
-      Sélectionnez le véhicule :
-    </p>
-    <div class="vehicle-list">
-      ${state.vehicles.map(v=>{
-        const isActive = state.activeVehicleIds && state.activeVehicleIds.has(v.id);
-        return `
-        <div class="vehicle-card ${isActive?'vehicle-card-disabled':''}" ${isActive?'':`onclick="selectVehicle('${v.id}')"`}>
-          <div class="vehicle-thumb">${v.photo?`<img src="${v.photo}" alt="${v.name}">`:`🚐`}</div>
-          <div class="vehicle-info">
-            <div class="vehicle-name">${v.name}</div>
-            <div class="vehicle-plate">${v.plate}</div>
-            ${isActive?`<div class="vehicle-busy">En trajet</div>`:''}
-          </div>
-          <span style="font-size:18px;color:var(--color-text-tertiary)">${isActive?'🔒':'›'}</span>
-        </div>`;
-      }).join("")}
-    </div>
-  `;
+  list.innerHTML = filtered.map(u => `
+    <div class="search-select-option ${state.selectedUserName === u.nom ? 'selected' : ''}"
+         onclick="selectUser('${u.nom.replace(/'/g, "\\'")}')">
+      ${u.nom}
+    </div>`).join("");
 }
 
-async function loadVehicles() {
-  el("screenScan").innerHTML = `<div class="spinner"></div><p style="text-align:center;font-size:14px;color:var(--color-text-secondary)">Chargement...</p>`;
-  try {
-    const [vehicles, conducteurs, activeRes] = await Promise.all([getVehicles(), getConducteurs(), getActiveResources()]);
-    state.vehicles = vehicles;
-    state.activeVehicleIds = activeRes.vehicleIds;
-    state.activeConducteurs = activeRes.conducteurs;
-    CONDUCTEURS = conducteurs;
-    console.log("Véhicules chargés:", vehicles.length, "Conducteurs:", conducteurs.length, "Véhicules actifs:", activeRes.vehicleIds.size, "Conducteurs actifs:", activeRes.conducteurs.size);
-    renderScan();
-  } catch(e) {
-    console.error("Erreur loadVehicles:", e);
-    el("screenScan").innerHTML = `
-      <p style="text-align:center;padding:2rem;font-size:14px;color:var(--color-text-secondary)">
-        Erreur de connexion Airtable.<br>
-        <small style="font-size:12px;color:#999">${e.message}</small><br><br>
-        <button onclick="loadVehicles()" style="padding:8px 20px">Réessayer</button>
-      </p>`;
+function selectUser(nom) {
+  state.selectedUserName = nom;
+  state.loginError = "";
+  closeUserDropdown();
+  // Mettre à jour le trigger
+  const trigger = el("userTrigger");
+  if (trigger) {
+    trigger.classList.remove("no-value");
+    trigger.classList.add("has-value");
+    trigger.querySelector("span").textContent = nom;
   }
+  updateLoginBtn();
 }
 
-async function selectVehicle(vid) {
-  state.vehicle = state.vehicles.find(x=>x.id===vid);
-  if (state.mode === "trip") {
-    el("screenScan").innerHTML = `<div class="spinner"></div><p style="text-align:center;font-size:14px;color:var(--color-text-secondary)">Vérification en cours...</p>`;
-    try {
-      const active = await getActiveTrip(vid);
-      if (active) { state.activeTrip = active; state.screen = "active"; }
-      else { state.screen = "start"; state.selectedEmployee=""; state.selectedReason=""; }
-    } catch(e) { state.screen = "start"; }
-  } else {
-    state.screen = "history";
-    state.trips = [];
+function onUserSelect(val) {
+  state.selectedUserName = val;
+  state.loginError = "";
+  updateLoginBtn();
+}
+
+function onPinInput(val) {
+  state.pin = val;
+  state.loginError = "";
+  updateLoginBtn();
+}
+
+function updateLoginBtn() {
+  const btn = el("btnLogin");
+  if (btn) btn.disabled = !(state.selectedUserName && state.pin);
+}
+
+async function doLogin() {
+  if (!state.selectedUserName || !state.pin) return;
+  const user = state.users.find(u => u.nom === state.selectedUserName);
+  if (!user) { state.loginError = "Utilisateur introuvable."; render(); return; }
+  if (user.pin !== state.pin) {
+    state.loginError = "Code personnel incorrect.";
+    state.pin = "";
+    render();
+    return;
+  }
+  // Connexion réussie
+  state.currentUser = { id: user.id, nom: user.nom };
+  state.loginError = "";
+  state.pin = "";
+  state.selectedUserName = "";
+  state.busyPoints = [];
+
+  // Vérifier si l'utilisateur a une charge en cours
+  el("screenLogin").innerHTML = `<div class="spinner"></div><p style="text-align:center;font-size:14px;color:var(--color-text-secondary)">Connexion...</p>`;
+  try {
+    const active = await getActiveChargeForUser(user.nom);
+    if (active) {
+      state.chargeRecordId = active.id;
+      state.chargeStartTime = active.dateDebut;
+      state.selectedPoint = active.point;
+      state.screen = "charging";
+    } else {
+      state.screen = "home";
+    }
+  } catch (e) {
+    console.error("Erreur vérification charge active:", e);
+    state.screen = "home";
   }
   render();
-  if (state.screen === "history") loadAndRenderHistory();
 }
 
 // ============================================================
-// ECRAN DEMARRAGE
+// ECRAN ACCUEIL
 // ============================================================
-function renderStart() {
-  const v = state.vehicle, now = new Date();
-  el("screenStart").innerHTML = `
-    <div class="info-bar">
-      <div class="vehicle-thumb" style="width:42px;height:42px;font-size:18px;border-radius:8px">
-        ${v.photo?`<img src="${v.photo}" alt="${v.name}" style="width:100%;height:100%;object-fit:cover;border-radius:8px">`:`🚐`}
+function renderHome() {
+  const u = state.currentUser;
+  const busy1 = state.busyPoints.find(b => b.point === "Point 1");
+  const busy2 = state.busyPoints.find(b => b.point === "Point 2");
+
+  el("screenHome").innerHTML = `
+    <div class="welcome-screen">
+      <div class="welcome-avatar">⚡</div>
+      <div class="welcome-hello">Connecté en tant que</div>
+      <div class="welcome-name">${u.nom}</div>
+
+      <div class="mb-4" style="text-align:left">
+        <label class="field-label" style="margin-bottom:8px;text-align:center">Quel côté de la borne ?</label>
+        <div class="point-row">
+          <button class="point-btn ${state.selectedPoint === "Point 1" ? "point-active" : ""} ${busy1 ? "point-busy" : ""}"
+                  data-point="Point 1" ${busy1 ? "disabled" : `onclick="pickPoint('Point 1')"`}>
+            <div class="point-number">1</div>
+            <div class="point-label">${busy1 ? "Occupé" : "Gauche"}</div>
+            ${busy1 ? `<div class="point-busy-user">🔒 ${busy1.utilisateur}</div>` : ""}
+          </button>
+          <button class="point-btn ${state.selectedPoint === "Point 2" ? "point-active" : ""} ${busy2 ? "point-busy" : ""}"
+                  data-point="Point 2" ${busy2 ? "disabled" : `onclick="pickPoint('Point 2')"`}>
+            <div class="point-number">2</div>
+            <div class="point-label">${busy2 ? "Occupé" : "Droite"}</div>
+            ${busy2 ? `<div class="point-busy-user">🔒 ${busy2.utilisateur}</div>` : ""}
+          </button>
+        </div>
+        ${state.busyLoading ? `<div style="text-align:center;font-size:12px;color:var(--color-text-tertiary);margin-top:6px">Vérification des bornes...</div>` : ""}
       </div>
-      <div><div class="v-name">${v.name}</div><div class="v-plate">${v.plate}</div></div>
-      <div class="v-right"><div class="v-date">${fmtDate(now)}</div><div class="v-time">${fmtTime(now)}</div></div>
-    </div>
-    <div class="mb-4">
-      <label class="field-label">Conducteur</label>
-      <select id="selConducteur" onchange="state.selectedEmployee=this.value;updateStartBtn()">
-        <option value="">-- Sélectionner --</option>
-        ${CONDUCTEURS.map(c=>{
-          const busy = state.activeConducteurs && state.activeConducteurs.has(c);
-          return `<option value="${c}" ${busy?"disabled":""} ${state.selectedEmployee===c?"selected":""}>${c}${busy?" (en trajet)":""}</option>`;
-        }).join("")}
-      </select>
-    </div>
-    <div class="mb-4">
-      <label class="field-label" style="margin-bottom:8px">Motif du trajet</label>
-      <div class="reason-grid">
-        ${REASONS.map(r=>`
-          <div class="reason-btn ${state.selectedReason===r.id?"active":""}" onclick="pickReason('${r.id}')">
-            <div class="r-icon">${r.icon}</div>
-            <div class="r-label">${r.label}</div>
-          </div>`).join("")}
-      </div>
-    </div>
-    <div class="btn-row">
-      <button class="btn-cancel" onclick="goBack()">Annuler</button>
-      <button class="btn-primary" id="btnStart" onclick="startTrip()" ${!(state.selectedEmployee&&state.selectedReason)?"disabled":""}>
-        Démarrer le trajet
+
+      <button class="welcome-btn welcome-btn-primary" onclick="startCharge()" id="btnStartCharge"
+              ${!state.selectedPoint ? "style=opacity:0.4;pointer-events:none" : ""}>
+        <div class="btn-icon-circle btn-icon-circle-blue">🔌</div>
+        <div class="btn-text">
+          <span class="btn-label">Lancer une recharge</span>
+          <span class="btn-sub">Démarrer le compteur</span>
+        </div>
       </button>
+
+      <button class="welcome-btn welcome-btn-secondary" onclick="openHistory()">
+        <div class="btn-icon-circle btn-icon-circle-gray">📊</div>
+        <div class="btn-text">
+          <span class="btn-label">Mon historique</span>
+          <span class="btn-sub">Voir mes recharges passées</span>
+        </div>
+      </button>
+
+      <button class="welcome-btn-logout" onclick="logout()">Se déconnecter</button>
     </div>
   `;
+
+  // Charger les points occupés en arrière-plan
+  if (!state.busyLoading && !state.busyPoints._loaded) loadBusyPoints();
 }
 
-function pickReason(id) {
-  state.selectedReason = id;
-  document.querySelectorAll(".reason-btn").forEach(b=>b.classList.toggle("active",b.getAttribute("onclick").includes(`'${id}'`)));
-  updateStartBtn();
-}
-function updateStartBtn() { const b=el("btnStart"); if(b) b.disabled=!(state.selectedEmployee&&state.selectedReason); }
-
-async function startTrip() {
-  if (!state.vehicle || !state.selectedEmployee || !state.selectedReason) return;
-  const btn=el("btnStart"); if(btn){btn.disabled=true;btn.textContent="Enregistrement...";}
+async function loadBusyPoints() {
+  state.busyLoading = true;
+  const zone = el("screenHome");
+  // Petit texte pendant le chargement
   try {
-    const rec = await createTrip(state.vehicle.id, state.selectedEmployee, state.selectedReason);
-    state.activeTrip = { id:rec.id, conducteur:state.selectedEmployee, motif:state.selectedReason, dateDepart:rec.fields[F.T_DATE_DEPART]||new Date().toISOString() };
-    state.activeVehicleIds.add(state.vehicle.id);
-    state.activeConducteurs.add(state.selectedEmployee);
-    state.screen = "active"; render();
-  } catch(e) {
-    alert("Erreur lors de la création du trajet.");
-    if(btn){btn.disabled=false;btn.textContent="Démarrer le trajet";}
+    state.busyPoints = await getBusyPoints();
+    state.busyPoints._loaded = true;
+    // Si un point sélectionné est maintenant occupé, le désélectionner
+    if (state.selectedPoint && state.busyPoints.find(b => b.point === state.selectedPoint)) {
+      state.selectedPoint = "";
+    }
+  } catch (e) {
+    console.error("Erreur chargement points occupés:", e);
+    state.busyPoints = [];
+  }
+  state.busyLoading = false;
+  if (state.screen === "home") renderHome();
+}
+
+function pickPoint(p) {
+  state.selectedPoint = p;
+  document.querySelectorAll(".point-btn").forEach(b => {
+    b.classList.toggle("point-active", b.dataset.point === p);
+  });
+  const btn = el("btnStartCharge");
+  if (btn) { btn.style.opacity = "1"; btn.style.pointerEvents = "auto"; }
+}
+
+function logout() {
+  if (state.elapsedInterval) clearInterval(state.elapsedInterval);
+  state.currentUser = null;
+  state.selectedPoint = "";
+  state.busyPoints = [];
+  state.screen = "login";
+  render();
+}
+
+// ============================================================
+// LANCER UNE CHARGE
+// ============================================================
+async function startCharge() {
+  if (!state.selectedPoint) return;
+  el("screenHome").innerHTML = `<div class="spinner"></div><p style="text-align:center;font-size:14px;color:var(--color-text-secondary)">Démarrage de la recharge...</p>`;
+  try {
+    const rec = await createCharge(state.currentUser.nom, state.selectedPoint);
+    state.chargeRecordId = rec.id;
+    state.chargeStartTime = rec.fields["DateDebut"] || new Date().toISOString();
+    state.screen = "charging";
+    render();
+  } catch (e) {
+    alert("Erreur lors du démarrage de la recharge.");
+    console.error(e);
+    render();
   }
 }
 
 // ============================================================
-// ECRAN ACTIF
+// ECRAN CHARGE EN COURS
 // ============================================================
-function renderActive() {
-  const v=state.vehicle, t=state.activeTrip;
-  const rLabel = REASONS.find(r=>r.id===t.motif)?.label||t.motif;
-  el("screenActive").innerHTML = `
-    <div class="active-banner">
-      <div><span class="pulse-dot"></span><span class="active-label">Trajet en cours</span></div>
-      <div class="active-elapsed" id="elapsedDisplay">${elapsed(t.dateDepart)}</div>
+function renderCharging() {
+  const t = state.chargeStartTime;
+  const mins = elapsedMinutes(t);
+  const cost = COST_PER_MINUTE * mins;
+
+  el("screenCharging").innerHTML = `
+    <div class="charging-banner">
+      <div class="charging-label"><span class="pulse-dot"></span>Recharge en cours — ${state.selectedPoint}</div>
+      <div class="charging-elapsed" id="elapsedDisplay">${elapsed(t)}</div>
     </div>
+
+    <div class="charging-cost-box">
+      <div class="charging-cost-label">Coût estimé</div>
+      <div class="charging-cost-value" id="costDisplay">${fmtCost(cost)}</div>
+      <div class="charging-cost-sub">0,20 €/kWh × 11 kW</div>
+    </div>
+
     <div class="detail-grid">
-      <div class="detail-card"><div class="detail-label">Conducteur</div><div class="detail-value">${t.conducteur}</div></div>
-      <div class="detail-card"><div class="detail-label">Motif</div><div class="detail-value">${rLabel}</div></div>
-      <div class="detail-card"><div class="detail-label">Départ</div><div class="detail-value">${fmtTime(t.dateDepart)}</div></div>
-      <div class="detail-card"><div class="detail-label">Véhicule</div><div class="detail-value">${v.name}</div></div>
+      <div class="detail-card">
+        <div class="detail-label">Utilisateur</div>
+        <div class="detail-value">${state.currentUser.nom}</div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-label">Début</div>
+        <div class="detail-value">${fmtTime(t)}</div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-label">Point</div>
+        <div class="detail-value">${state.selectedPoint}</div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-label">Date</div>
+        <div class="detail-value">${fmtDate(t)}</div>
+      </div>
     </div>
-    <button class="btn-end" onclick="requestEnd()">Terminer le trajet</button>
+
+    <button class="btn-stop" onclick="stopCharge()">⏹ Arrêter la recharge</button>
   `;
+
+  // Timer live
   if (state.elapsedInterval) clearInterval(state.elapsedInterval);
-  state.elapsedInterval = setInterval(()=>{ const d=el("elapsedDisplay"); if(d) d.textContent=elapsed(t.dateDepart); }, 1000);
+  state.elapsedInterval = setInterval(() => {
+    const eDisp = el("elapsedDisplay");
+    const cDisp = el("costDisplay");
+    if (eDisp) eDisp.textContent = elapsed(t);
+    if (cDisp) {
+      const m = elapsedMinutes(t);
+      cDisp.textContent = fmtCost(COST_PER_MINUTE * m);
+    }
+  }, 1000);
 }
 
-function requestEnd() {
+async function stopCharge() {
   if (state.elapsedInterval) clearInterval(state.elapsedInterval);
-  state.screen="end"; state.hasAnomaly=null; state.anomalyText=""; render();
+
+  state.endDureeMin = Math.round(elapsedMinutes(state.chargeStartTime) * 10) / 10;
+  state.endCostEstime = Math.round(COST_PER_MINUTE * state.endDureeMin * 100) / 100;
+  state.compteurKwh = "";
+  state.previousCompteur = null;
+
+  // Charger le dernier relevé pour ce point
+  state.screen = "end";
+  render();
+  try {
+    state.previousCompteur = await getLastCompteur(state.selectedPoint);
+  } catch (e) {
+    console.error("Erreur récupération dernier compteur:", e);
+  }
+  // Re-render pour afficher le dernier relevé connu
+  renderEnd();
 }
 
 // ============================================================
-// ECRAN FIN
+// ECRAN FIN DE CHARGE — Saisie du relevé compteur
 // ============================================================
 function renderEnd() {
-  const t=state.activeTrip, now=new Date().toISOString();
-  state._endTime=now;
-  const rLabel=REASONS.find(r=>r.id===t.motif)?.label||t.motif;
+  const t = state.chargeStartTime;
+  const prevLabel = state.previousCompteur !== null
+    ? `Dernier relevé ${state.selectedPoint} : <strong>${state.previousCompteur.toFixed(1)} kWh</strong>`
+    : "Aucun relevé précédent trouvé";
+
+  const compteurValid = state.compteurKwh && parseFloat(state.compteurKwh) > 0 &&
+    (state.previousCompteur === null || parseFloat(state.compteurKwh) > state.previousCompteur);
+
   el("screenEnd").innerHTML = `
     <div style="background:var(--color-bg-2);border-radius:var(--radius-md);padding:1rem;margin-bottom:1.25rem">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <span style="font-size:13px;color:var(--color-text-secondary)">Récapitulatif</span>
-        <span style="font-size:13px;font-weight:500">${fmtDuration(t.dateDepart,now)}</span>
+        <span style="font-size:13px;color:var(--color-text-secondary)">Récapitulatif — ${state.selectedPoint}</span>
+        <span style="font-size:13px;font-weight:500">${fmtDuration(state.endDureeMin)}</span>
       </div>
-      <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:3px">Départ : ${fmtTime(t.dateDepart)} → Retour : ${fmtTime(now)}</div>
-      <div style="font-size:13px;color:var(--color-text-secondary)">${t.conducteur} — ${rLabel}</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:3px">Début : ${fmtTime(t)} → Fin : ${fmtTime(new Date())}</div>
+      <div style="font-size:13px;color:var(--color-text-secondary)">${state.currentUser.nom}</div>
     </div>
+
     <div class="mb-4">
-      <label class="field-label" style="margin-bottom:8px">Anomalie constatée ?</label>
-      <div style="display:flex;gap:8px">
-        <button class="anomaly-btn ${state.hasAnomaly===false?"no-active":""}" onclick="setAnomaly(false)">✓ Non, RAS</button>
-        <button class="anomaly-btn ${state.hasAnomaly===true?"yes-active":""}" onclick="setAnomaly(true)">⚠ Oui</button>
+      <label class="field-label">Relevé du compteur ${state.selectedPoint} (kWh) <span style="color:var(--red)">*</span></label>
+      <input type="number" inputmode="decimal" step="0.1" id="compteurInput"
+             placeholder="Ex : 1234.5" value="${state.compteurKwh}"
+             oninput="onCompteurInput(this.value)"
+             style="font-family:var(--font-mono);font-size:18px;text-align:center;${!compteurValid && state.compteurKwh ? 'border-color:var(--red)' : ''}">
+      <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:4px;line-height:1.5">
+        ${prevLabel}<br>
+        Relevé obligatoire — indiquez le nombre affiché sur le compteur de la borne.
+      </div>
+      <div id="compteurError" style="font-size:12px;color:var(--red);margin-top:4px;${compteurValid || !state.compteurKwh ? 'display:none' : ''}">
+        ${state.compteurKwh && state.previousCompteur !== null && parseFloat(state.compteurKwh) <= state.previousCompteur ? "La valeur doit être supérieure au dernier relevé (" + state.previousCompteur.toFixed(1) + " kWh)" : ""}
       </div>
     </div>
-    <div id="anomalyField" class="${state.hasAnomaly===true?"":"hidden"} mb-4">
-      <label class="field-label">Décrivez l'anomalie</label>
-      <textarea id="anomalyInput" placeholder="Ex : voyant moteur allumé, pneu à plat..." rows="3" style="resize:vertical" oninput="state.anomalyText=this.value">${state.anomalyText}</textarea>
-    </div>
+
     <div class="btn-row">
-      <button class="btn-cancel" onclick="goBack()">Retour</button>
-      <button class="btn-primary" id="btnConfirm" onclick="confirmEnd()" ${state.hasAnomaly===null?"disabled":""}>Confirmer la fin</button>
+      <button class="btn-back" onclick="cancelEnd()">Reprendre</button>
+      <button class="btn-login" style="flex:2" id="btnConfirmEnd" onclick="confirmEnd()" ${!compteurValid ? "disabled" : ""}>
+        Confirmer la fin
+      </button>
     </div>
   `;
 }
 
-function setAnomaly(val) {
-  state.hasAnomaly=val;
-  document.querySelectorAll(".anomaly-btn").forEach(b=>b.className="anomaly-btn");
-  if(val===false) document.querySelectorAll(".anomaly-btn")[0].classList.add("no-active");
-  if(val===true)  document.querySelectorAll(".anomaly-btn")[1].classList.add("yes-active");
-  el("anomalyField").classList.toggle("hidden",!val);
-  el("btnConfirm").disabled=false;
+function onCompteurInput(val) {
+  state.compteurKwh = val;
+  const compteur = parseFloat(val);
+  const valid = val && compteur > 0 && (state.previousCompteur === null || compteur > state.previousCompteur);
+  const btn = el("btnConfirmEnd");
+  if (btn) btn.disabled = !valid;
+
+  const errEl = el("compteurError");
+  if (errEl) {
+    if (val && state.previousCompteur !== null && compteur <= state.previousCompteur) {
+      errEl.textContent = "La valeur doit être supérieure au dernier relevé (" + state.previousCompteur.toFixed(1) + " kWh)";
+      errEl.style.display = "";
+    } else {
+      errEl.style.display = "none";
+    }
+  }
+
+  const input = el("compteurInput");
+  if (input) input.style.borderColor = (!valid && val) ? "var(--red)" : "";
+}
+
+function cancelEnd() {
+  state.screen = "charging";
+  render();
 }
 
 async function confirmEnd() {
-  if (state.hasAnomaly===null) return;
-  const btn=el("btnConfirm"); if(btn){btn.disabled=true;btn.textContent="Enregistrement...";}
+  const compteur = state.compteurKwh ? parseFloat(state.compteurKwh) : null;
+  if (compteur === null || compteur <= 0) return;
+  if (state.previousCompteur !== null && compteur <= state.previousCompteur) return;
+
+  const btn = el("btnConfirmEnd");
+  if (btn) { btn.disabled = true; btn.textContent = "Enregistrement..."; }
+
+  // Calcul conso réelle
+  let consoReelle = null;
+  let coutReel = null;
+  if (compteur !== null && state.previousCompteur !== null && compteur > state.previousCompteur) {
+    consoReelle = Math.round((compteur - state.previousCompteur) * 10) / 10;
+    coutReel = Math.round(consoReelle * COST_PER_KWH * 100) / 100;
+  }
+
   try {
-    await closeTrip(state.activeTrip.id, state.hasAnomaly, state.anomalyText);
-    state._confirmation={hasAnomaly:state.hasAnomaly};
-    if (state.vehicle) state.activeVehicleIds.delete(state.vehicle.id);
-    if (state.activeTrip?.conducteur) state.activeConducteurs.delete(state.activeTrip.conducteur);
-    state.activeTrip=null;
-    state.screen="confirmed"; render();
-    setTimeout(()=>{ state.screen="home"; state.vehicle=null; state.mode=null; state.homeActiveTrips=null; render(); }, 3000);
-  } catch(e) {
-    alert("Erreur lors de la clôture du trajet.");
-    if(btn){btn.disabled=false;btn.textContent="Confirmer la fin";}
+    await closeCharge(state.chargeRecordId, state.endDureeMin, state.endCostEstime, compteur, consoReelle, coutReel);
+    state.summary = {
+      dateDebut: state.chargeStartTime,
+      dateFin: new Date().toISOString(),
+      dureeMin: state.endDureeMin,
+      cost: state.endCostEstime,
+      compteurKwh: compteur,
+      previousCompteur: state.previousCompteur,
+      consoReelle,
+      coutReel,
+      point: state.selectedPoint
+    };
+    state.chargeStartTime = null;
+    state.chargeRecordId = null;
+    state.screen = "summary";
+    render();
+  } catch (e) {
+    alert("Erreur lors de l'enregistrement.");
+    console.error(e);
+    if (btn) { btn.disabled = false; btn.textContent = "Confirmer la fin"; }
   }
 }
 
 // ============================================================
-// CONFIRME
+// ECRAN RECAPITULATIF
 // ============================================================
-function renderConfirmed() {
-  const c=state._confirmation;
-  el("screenConfirmed").innerHTML = `
-    <div class="confirm-screen">
-      <div class="confirm-icon">✓</div>
-      <div class="confirm-title">Trajet enregistré !</div>
-      <div class="confirm-sub">${c?.hasAnomaly?"⚠️ Anomalie signalée.":"Aucune anomalie."}</div>
-    </div>`;
+function renderSummary() {
+  const s = state.summary;
+
+  el("screenSummary").innerHTML = `
+    <div class="summary-screen">
+      <div class="summary-icon">✓</div>
+      <div class="summary-title">Recharge terminée !</div>
+      <div class="summary-sub">Session enregistrée — ${s.point}</div>
+
+      <div style="background:var(--green-bg);border:1.5px solid var(--green);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.25rem;text-align:center">
+        <div style="font-size:11px;color:var(--green-dark);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Consommation réelle</div>
+        <div style="font-size:32px;font-weight:700;color:var(--green-dark);font-family:var(--font-mono)">${s.consoReelle !== null ? s.consoReelle.toFixed(1) + " kWh" : "—"}</div>
+        <div style="font-size:26px;font-weight:600;color:var(--green-dark);font-family:var(--font-mono);margin-top:6px">${s.coutReel !== null ? fmtCost(s.coutReel) : "—"}</div>
+        ${s.previousCompteur !== null && s.compteurKwh !== null ? `<div style="font-size:11px;color:var(--green-dark);opacity:0.7;margin-top:4px">${s.previousCompteur.toFixed(1)} → ${s.compteurKwh.toFixed(1)} kWh</div>` : ""}
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-row">
+          <span class="summary-row-label">Utilisateur</span>
+          <span class="summary-row-value">${state.currentUser.nom}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-row-label">Point</span>
+          <span class="summary-row-value">${s.point}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-row-label">Date</span>
+          <span class="summary-row-value">${fmtDate(s.dateDebut)}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-row-label">Début → Fin</span>
+          <span class="summary-row-value">${fmtTime(s.dateDebut)} → ${fmtTime(s.dateFin)}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-row-label">Durée</span>
+          <span class="summary-row-value">${fmtDuration(s.dureeMin)}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-row-label">Compteur borne</span>
+          <span class="summary-row-value" style="font-family:var(--font-mono)">${s.compteurKwh.toFixed(1)} kWh</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-row-label">Prix du kWh</span>
+          <span class="summary-row-value">${COST_PER_KWH.toFixed(2).replace(".",",")} €</span>
+        </div>
+      </div>
+
+      <button class="btn-home" onclick="goHome()">Retour à l'accueil</button>
+    </div>
+  `;
+}
+
+function goHome() {
+  state.summary = null;
+  state.selectedPoint = "";
+  state.busyPoints = [];
+  state.screen = "home";
+  render();
 }
 
 // ============================================================
-// HISTORIQUE
+// ECRAN HISTORIQUE
 // ============================================================
-async function loadAndRenderHistory() {
+function openHistory() {
+  state.screen = "history";
+  render();
+  loadHistory();
+}
+
+async function loadHistory() {
   el("screenHistory").innerHTML = `<div class="spinner"></div><p style="text-align:center;font-size:14px;color:var(--color-text-secondary)">Chargement...</p>`;
-  try { state.trips = await getAllTrips(); renderHistory(); }
-  catch(e) { el("screenHistory").innerHTML=`<p style="text-align:center;padding:2rem;font-size:13px;color:var(--color-text-secondary)">Erreur de chargement.</p>`; }
+  try {
+    state.history = await getUserCharges(state.currentUser.nom);
+    renderHistory();
+  } catch (e) {
+    console.error("Erreur chargement historique:", e);
+    el("screenHistory").innerHTML = `<p style="text-align:center;padding:2rem;font-size:13px;color:var(--color-text-secondary)">Erreur de chargement.</p>`;
+  }
 }
 
 function renderHistory() {
-  const searchEl = el("searchInput");
+  const searchEl = el("historySearch");
   const search = (searchEl?.value || "").toLowerCase();
-  const filtered = state.trips.filter(t =>
-    !search || t.conducteur.toLowerCase().includes(search) || t.motif.toLowerCase().includes(search) ||
-    (search === "oui" && t.anomalie) || (search === "non" && !t.anomalie) || fmtDate(t.dateDepart).includes(search)
+
+  const filtered = state.history.filter(c =>
+    !search || fmtDate(c.dateDebut).includes(search) || fmtCost(c.cout).toLowerCase().includes(search) || (c.point && c.point.toLowerCase().includes(search))
   );
 
+  // Calcul du total (coût réel si dispo, sinon estimé)
+  const totalCost = filtered.reduce((sum, c) => {
+    if (c.consoReelle) return sum + (c.consoReelle * COST_PER_KWH);
+    return sum + (c.cout || 0);
+  }, 0);
+  const totalDuration = filtered.reduce((sum, c) => sum + (c.duree || 0), 0);
+  const totalConsoReelle = filtered.reduce((sum, c) => sum + (c.consoReelle || 0), 0);
+
+  const statsHtml = filtered.length > 0 ? `
+    <div style="display:flex;gap:8px;margin-bottom:1rem">
+      <div style="flex:1;background:var(--blue-bg);border-radius:var(--radius-md);padding:0.65rem 0.75rem;text-align:center">
+        <div style="font-size:11px;color:var(--blue-dark);opacity:0.7;margin-bottom:2px">Total coût</div>
+        <div style="font-size:15px;font-weight:600;color:var(--blue-dark);font-family:var(--font-mono)">${fmtCost(totalCost)}</div>
+      </div>
+      <div style="flex:1;background:var(--green-bg);border-radius:var(--radius-md);padding:0.65rem 0.75rem;text-align:center">
+        <div style="font-size:11px;color:var(--green-dark);opacity:0.7;margin-bottom:2px">Total kWh</div>
+        <div style="font-size:15px;font-weight:600;color:var(--green-dark);font-family:var(--font-mono)">${totalConsoReelle.toFixed(1)}</div>
+      </div>
+      <div style="flex:1;background:var(--color-bg-2);border-radius:var(--radius-md);padding:0.65rem 0.75rem;text-align:center">
+        <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:2px">Durée</div>
+        <div style="font-size:15px;font-weight:600">${fmtDuration(totalDuration)}</div>
+      </div>
+    </div>` : "";
+
   const resultsHtml = filtered.length === 0
-    ? `<p style="text-align:center;padding:2rem;font-size:13px;color:var(--color-text-tertiary)">Aucun résultat</p>`
-    : filtered.map(t => {
-        const rIcon = t.anomalie ? "⚠️" : (REASONS.find(r => r.id === t.motif)?.icon || "📋");
-        const rLabel = REASONS.find(r => r.id === t.motif)?.label || t.motif;
+    ? `<p style="text-align:center;padding:2rem;font-size:13px;color:var(--color-text-tertiary)">Aucune recharge enregistrée</p>`
+    : filtered.map(c => {
+        const coutReel = c.consoReelle ? (c.consoReelle * COST_PER_KWH) : null;
         return `
-          <div class="history-item" onclick="showDetail('${t.id}')">
-            <div class="history-icon" style="background:${t.anomalie ? "var(--red-bg)" : "var(--color-bg-2)"}">${rIcon}</div>
-            <div style="flex:1;min-width:0">
-              <div class="history-name">${t.conducteur}</div>
-              <div class="history-meta">${rLabel}${t.anomalie ? ' · <span style="color:var(--red)">Anomalie</span>' : ""}</div>
-            </div>
-            <div class="history-right">
-              <div class="history-date">${fmtDate(t.dateDepart)}</div>
-              <div class="history-time">${fmtTime(t.dateDepart)}${t.dateRetour ? " · " + fmtDuration(t.dateDepart, t.dateRetour) : ""}</div>
-            </div>
-          </div>`;
+      <div class="history-item">
+        <div class="history-icon">⚡</div>
+        <div style="flex:1;min-width:0">
+          <div class="history-name">${c.consoReelle ? c.consoReelle.toFixed(1) + " kWh" : fmtDuration(c.duree)}${c.point ? ` · ${c.point}` : ""}</div>
+          <div class="history-meta">${fmtTime(c.dateDebut)}${c.dateFin ? " → " + fmtTime(c.dateFin) : " · en cours"} · ${fmtDuration(c.duree)}</div>
+        </div>
+        <div class="history-right">
+          <div class="history-date">${fmtDate(c.dateDebut)}</div>
+          <div class="history-cost">${coutReel ? fmtCost(coutReel) : (c.cout ? "~" + fmtCost(c.cout) : "—")}</div>
+        </div>
+      </div>`;
       }).join("");
 
   // Si le champ de recherche existe déjà, ne mettre à jour que les résultats
   const resultsEl = el("historyResults");
   if (resultsEl && searchEl) {
-    resultsEl.innerHTML = `<div class="history-count">${filtered.length} trajet${filtered.length > 1 ? "s" : ""}</div>` + resultsHtml;
+    resultsEl.innerHTML = `
+      <div class="history-count">${filtered.length} recharge${filtered.length > 1 ? "s" : ""}</div>
+      ${statsHtml}
+      ${resultsHtml}`;
   } else {
     el("screenHistory").innerHTML = `
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" value="${search}" placeholder="Conducteur, motif, date, oui/non..." oninput="renderHistory()">
+        <input type="text" id="historySearch" value="${search}" placeholder="Rechercher par date..." oninput="renderHistory()">
       </div>
       <div id="historyResults">
-        <div class="history-count">${filtered.length} trajet${filtered.length > 1 ? "s" : ""}</div>
+        <div class="history-count">${filtered.length} recharge${filtered.length > 1 ? "s" : ""}</div>
+        ${statsHtml}
         ${resultsHtml}
       </div>
     `;
   }
 }
 
-function showDetail(tripId) {
-  const t=state.trips.find(x=>x.id===tripId);
-  if (!t||!t.anomalie) return;
-  el("detailOverlay").innerHTML=`<div class="overlay" onclick="closeDetail()"></div>`;
-  el("detailPanel").innerHTML=`
-    <div class="detail-panel">
-      <div class="panel-handle"></div>
-      <div class="panel-title">⚠️ Anomalie signalée</div>
-      <div class="panel-meta">${t.conducteur} — ${fmtDate(t.dateDepart)} à ${fmtTime(t.dateDepart)}</div>
-      <div class="panel-desc">${t.descAnomalie||"Aucune description fournie."}</div>
-      <button class="btn-close-panel" onclick="closeDetail()">Fermer</button>
-    </div>`;
-  show("detailOverlay"); show("detailPanel");
-}
-function closeDetail() { hide("detailOverlay"); hide("detailPanel"); }
-
-// Init
+// ============================================================
+// INIT
+// ============================================================
 try {
   render();
-} catch(e) {
-  var errDiv = document.createElement('div');
-  errDiv.style.cssText = 'padding:2rem 1rem;text-align:center';
+} catch (e) {
+  var errDiv = document.createElement("div");
+  errDiv.style.cssText = "padding:2rem 1rem;text-align:center";
   errDiv.innerHTML = '<p style="color:#D85A30;font-weight:500;margin-bottom:8px">Erreur au démarrage</p>' +
-    '<p style="font-size:12px;color:#888;word-break:break-all">' + e.message + '</p>';
-  document.querySelector('.app').appendChild(errDiv);
+    '<p style="font-size:12px;color:#888;word-break:break-all">' + e.message + "</p>";
+  document.querySelector(".app").appendChild(errDiv);
   console.error("Init error:", e);
 }
 </script>
